@@ -9,6 +9,18 @@ import { LoginPage, RegisterPage, ProtectedRoute } from '@/features/auth';
 // Dashboard
 import { DashboardPage } from '@/features/dashboard';
 
+// Household
+import { HouseholdPage } from '@/features/household';
+
+// Tasks
+import { TasksPage } from '@/features/tasks';
+
+// Calendar
+import { CalendarPage } from '@/features/calendar';
+
+// Inventory
+import { InventoryPage } from '@/features/inventory';
+
 // Placeholder pages for other modules
 function PlaceholderPage({ title }: { title: string }) {
   return (
@@ -57,7 +69,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/household',
-        element: <PlaceholderPage title="Household" />,
+        element: <HouseholdPage />,
       },
       {
         path: '/employees',
@@ -77,11 +89,11 @@ export const router = createBrowserRouter([
       },
       {
         path: '/tasks',
-        element: <PlaceholderPage title="Tasks" />,
+        element: <TasksPage />,
       },
       {
         path: '/inventory',
-        element: <PlaceholderPage title="Inventory" />,
+        element: <InventoryPage />,
       },
       {
         path: '/finance',
@@ -93,7 +105,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/calendar',
-        element: <PlaceholderPage title="Calendar" />,
+        element: <CalendarPage />,
       },
       {
         path: '/recipes',
