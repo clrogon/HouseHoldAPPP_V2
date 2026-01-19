@@ -1,4 +1,4 @@
-import { Plus, CheckSquare, Calendar, DollarSign, Package } from 'lucide-react';
+import { CheckSquare, Calendar, DollarSign, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';

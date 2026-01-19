@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
 import { FinanceSummaryCards } from '../components/FinanceSummaryCards';
 import { BudgetOverview } from '../components/BudgetOverview';
 import { TransactionList } from '../components/TransactionList';

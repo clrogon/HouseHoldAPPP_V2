@@ -1,4 +1,4 @@
-import { User, Calendar, BookOpen, Heart, MoreHorizontal, AlertCircle } from 'lucide-react';
+import { Calendar, BookOpen, Heart, MoreHorizontal, AlertCircle } from 'lucide-react';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';

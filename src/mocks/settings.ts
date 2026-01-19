@@ -144,7 +144,7 @@ export async function removeDevice(deviceId: string): Promise<void> {
   }
 }
 
-export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+export async function changePassword(currentPassword: string, _newPassword: string): Promise<void> {
   await new Promise(resolve => setTimeout(resolve, 500));
   if (currentPassword === 'wrong') {
     throw new Error('Current password is incorrect');

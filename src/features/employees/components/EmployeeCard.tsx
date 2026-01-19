@@ -1,15 +1,12 @@
 import {
-  User,
   Mail,
   Phone,
   Clock,
   DollarSign,
-  Briefcase,
 } from 'lucide-react';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Badge } from '@/shared/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
-import { Button } from '@/shared/components/ui/button';
 import { cn } from '@/shared/lib/utils';
 import type { Employee } from '../types/employees.types';
 

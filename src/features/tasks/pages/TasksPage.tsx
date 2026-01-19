@@ -5,7 +5,7 @@ import { TaskListView } from '../components/TaskListView';
 import { TaskKanbanView } from '../components/TaskKanbanView';
 import { TaskFiltersComponent, type TaskFilters } from '../components/TaskFilters';
 import { CreateTaskDialog } from '../components/CreateTaskDialog';
-import { mockTasks, taskTags, createTask, updateTask, deleteTask, type Task } from '@/mocks/tasks';
+import { mockTasks, taskTags, createTask, type Task } from '@/mocks/tasks';
 
 type ViewMode = 'list' | 'kanban' | 'calendar';
 

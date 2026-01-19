@@ -73,7 +73,7 @@ export function BudgetWidget({ categories, totalSpent, totalBudget }: BudgetWidg
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number) => [`$${value.toLocaleString()}`, 'Spent']}
+                  formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Spent']}
                 />
                 <Legend
                   layout="horizontal"

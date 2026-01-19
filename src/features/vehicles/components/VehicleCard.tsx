@@ -1,7 +1,6 @@
 import { format, differenceInDays } from 'date-fns';
 import {
   Car,
-  Fuel,
   Calendar,
   Shield,
   User,

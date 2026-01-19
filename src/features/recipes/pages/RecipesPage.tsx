@@ -1,9 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Search, ChefHat, Filter, Heart } from 'lucide-react';
+import { Search, ChefHat, Heart } from 'lucide-react';
 import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/shared/components/ui/button';
-import { Badge } from '@/shared/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -22,7 +20,7 @@ import {
 
 export function RecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
+  const [_mealPlans, setMealPlans] = useState<MealPlan[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { HouseholdProfile } from '../components/HouseholdProfile';
 import { MembersList } from '../components/MembersList';
 import { InvitationsList } from '../components/InvitationsList';
@@ -16,7 +16,7 @@ import {
 
 export function HouseholdPage() {
   const { user } = useAuthStore();
-  const [household, setHousehold] = useState<Household>(mockHousehold);
+  const [household, _setHousehold] = useState<Household>(mockHousehold);
   const [members, setMembers] = useState<HouseholdMember[]>(mockMembers);
   const [invitations, setInvitations] = useState<Invitation[]>(mockInvitations);
 

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { format } from 'date-fns';
 import {
   Package,
@@ -10,7 +9,6 @@ import {
   Minus,
   ShoppingCart,
   Trash2,
-  Edit,
 } from 'lucide-react';
 import {
   Table,

@@ -11,7 +11,6 @@ import {
   mockWeightRecords,
   mockExpenses,
   addPet,
-  updatePet,
   deletePet,
 } from '@/mocks/pets';
 

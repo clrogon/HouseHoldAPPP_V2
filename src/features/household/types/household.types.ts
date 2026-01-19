@@ -12,7 +12,7 @@ export interface Household {
 }
 
 export interface HouseholdMember {
-  id: string visaId: string;
+  id: string;
   email: string;
   firstName: string;
   lastName: string;

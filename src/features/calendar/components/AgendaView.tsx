@@ -3,7 +3,6 @@ import {
   startOfMonth,
   endOfMonth,
   format,
-  isSameDay,
   isToday,
   isTomorrow,
 } from 'date-fns';

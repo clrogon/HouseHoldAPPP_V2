@@ -2,9 +2,7 @@ import {
   TrendingUp,
   TrendingDown,
   Wallet,
-  PiggyBank,
   Receipt,
-  DollarSign,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import type { FinanceSummary } from '../types/finance.types';

@@ -19,7 +19,7 @@ import {
 
 export function AdminPage() {
   const [users, setUsers] = useState<SystemUser[]>([]);
-  const [households, setHouseholds] = useState<SystemHousehold[]>([]);
+  const [_households, setHouseholds] = useState<SystemHousehold[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [stats, setStats] = useState<SystemStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);

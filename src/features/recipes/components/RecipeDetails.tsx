@@ -21,8 +21,6 @@ interface RecipeDetailsProps {
 }
 
 export function RecipeDetails({ recipe, onBack, onToggleFavorite }: RecipeDetailsProps) {
-  const totalTime = recipe.prepTime + recipe.cookTime;
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

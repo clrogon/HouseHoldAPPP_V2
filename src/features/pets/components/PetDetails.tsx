@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ArrowLeft, Syringe, Calendar, Pill, Scale, DollarSign, Dog, Cat, Bird, Fish, Rabbit } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';

@@ -3,7 +3,6 @@ import { Calendar, CheckCircle2, Circle, Clock, MoreVertical, AlertTriangle, Use
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
-import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Progress } from '@/shared/components/ui/progress';
 import {
   DropdownMenu,

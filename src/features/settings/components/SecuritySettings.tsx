@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/components/ui/table';
-import type { SecuritySettings as SecuritySettingsType, TrustedDevice, LoginHistoryEntry } from '../types/settings.types';
+import type { SecuritySettings as SecuritySettingsType } from '../types/settings.types';
 
 interface SecuritySettingsProps {
   settings: SecuritySettingsType;

@@ -1,14 +1,9 @@
-import { useState } from 'react';
 import { format } from 'date-fns';
 import {
   Car,
   Fuel,
   Wrench,
   Calendar,
-  Shield,
-  User,
-  Hash,
-  Palette,
   Gauge,
   ArrowLeft,
 } from 'lucide-react';

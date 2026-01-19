@@ -1,10 +1,8 @@
 import { Check, Trash2, ShoppingBag } from 'lucide-react';
-import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Badge } from '@/shared/components/ui/badge';
-import { cn } from '@/shared/lib/utils';
 import type { ShoppingListItem } from '../types/inventory.types';
 
 interface ShoppingListProps {
