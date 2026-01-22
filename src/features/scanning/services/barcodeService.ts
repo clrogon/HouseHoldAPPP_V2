@@ -44,8 +44,8 @@ export async function startContinuousScan(
   const reader = getCodeReader();
 
   try {
-    const controls = await reader.decodeFromVideoDevice(
-      undefined,
+    await reader.decodeFromVideoDevice(
+      null,
       videoElement,
       (result, error) => {
         if (result) {
@@ -62,7 +62,7 @@ export async function startContinuousScan(
     );
 
     return () => {
-      controls.stop();
+      reader.reset();
     };
   } catch (error) {
     onError?.(error as Error);

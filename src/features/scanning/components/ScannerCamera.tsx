@@ -1,4 +1,4 @@
-import { useRef, ChangeEvent } from 'react';
+import { useRef, type ChangeEvent } from 'react';
 import Webcam from 'react-webcam';
 import { Camera, Upload, RotateCcw, X } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';

@@ -17,9 +17,7 @@ export interface UseCameraResult {
   handleUserMediaError: (error: Error | string) => void;
 }
 
-export function useCamera(options: UseCameraOptions = {}): UseCameraResult {
-  const { facingMode = 'environment' } = options;
-
+export function useCamera(_options: UseCameraOptions = {}): UseCameraResult {
   const webcamRef = useRef<Webcam | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isReady, setIsReady] = useState(false);

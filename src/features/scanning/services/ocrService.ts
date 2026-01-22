@@ -30,10 +30,13 @@ export async function performOCR(
     },
   });
 
+  // Extract words if available, otherwise return empty array
+  const words = (result.data as { words?: Array<{ text: string; confidence: number; bbox: { x0: number; y0: number; x1: number; y1: number } }> }).words || [];
+
   return {
     text: result.data.text,
     confidence: result.data.confidence,
-    words: result.data.words.map((word) => ({
+    words: words.map((word) => ({
       text: word.text,
       confidence: word.confidence,
       bbox: word.bbox,

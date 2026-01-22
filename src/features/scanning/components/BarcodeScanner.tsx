@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Barcode, Loader2, Search, Package, Plus, Check } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
@@ -6,7 +6,6 @@ import { Input } from '@/shared/components/ui/input';
 import { Badge } from '@/shared/components/ui/badge';
 import { ScannerCamera } from './ScannerCamera';
 import { scanBarcodeFromImage, lookupProduct, formatBarcodeType } from '../services/barcodeService';
-import { formatCurrency } from '@/shared/lib/currency';
 import type { BarcodeResult, ProductLookupResult } from '../types/scanning.types';
 
 interface BarcodeScannerProps {

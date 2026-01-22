@@ -110,7 +110,7 @@ export async function addReceiptItemsToInventory(
 }
 
 export async function createTransactionFromReceipt(
-  receipt: ScannedReceipt
+  _receipt: ScannedReceipt
 ): Promise<{ success: boolean; transactionId: string }> {
   await delay(500);
   // In a real implementation, this would create a finance transaction
