@@ -54,6 +54,7 @@ export const en = {
     tasks: 'Tasks',
     calendar: 'Calendar',
     inventory: 'Inventory',
+    scanning: 'Scanning',
     finance: 'Finance',
     vehicles: 'Vehicles',
     employees: 'Staff',

@@ -7,6 +7,7 @@ import {
   PawPrint,
   CheckSquare,
   Package,
+  ScanLine,
   Wallet,
   Calendar,
   ChefHat,
@@ -76,6 +77,12 @@ export function AppSidebar() {
       title: t.navigation.inventory,
       icon: Package,
       href: '/inventory',
+    },
+    {
+      title: t.navigation.scanning,
+      icon: ScanLine,
+      href: '/scanning',
+      roles: ['ADMIN', 'PARENT', 'STAFF'],
     },
     {
       title: t.navigation.finance,
