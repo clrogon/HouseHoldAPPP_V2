@@ -195,15 +195,15 @@ export class AuthService {
     };
 
     const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('jwt.secret'),
-      expiresIn: this.configService.get<string>('jwt.expiresIn', '15m'),
+      secret: this.configService.get<string>('jwt.secret') || 'fallback-secret',
+      expiresIn: 900, // 15 minutes in seconds
     });
 
     const refreshToken = this.jwtService.sign(
       { sub: user.id, email: user.email },
       {
-        secret: this.configService.get<string>('jwt.refreshSecret'),
-        expiresIn: this.configService.get<string>('jwt.refreshExpiresIn', '7d'),
+        secret: this.configService.get<string>('jwt.refreshSecret') || 'fallback-refresh-secret',
+        expiresIn: 604800, // 7 days in seconds
       },
     );
 

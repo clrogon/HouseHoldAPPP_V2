@@ -21,7 +21,8 @@ import {
   HouseholdResponseDto,
   HouseholdMemberDto,
 } from './dto';
-import { CurrentUser, JwtPayload } from '../../common/decorators';
+import { CurrentUser } from '../../common/decorators';
+import type { JwtPayload } from '../../common/decorators';
 import { HouseholdGuard } from '../../common/guards';
 
 @ApiTags('household')

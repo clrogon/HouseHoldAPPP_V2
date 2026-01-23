@@ -20,7 +20,8 @@ import {
   RefreshTokenDto,
   TokenResponseDto,
 } from './dto';
-import { Public, CurrentUser, JwtPayload } from '../../common/decorators';
+import { Public, CurrentUser } from '../../common/decorators';
+import type { JwtPayload } from '../../common/decorators';
 
 @ApiTags('auth')
 @Controller('auth')

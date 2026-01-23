@@ -20,7 +20,8 @@ import {
   UserProfileResponseDto,
   ChangePasswordDto,
 } from './dto';
-import { CurrentUser, JwtPayload } from '../../common/decorators';
+import { CurrentUser } from '../../common/decorators';
+import type { JwtPayload } from '../../common/decorators';
 
 @ApiTags('users')
 @ApiBearerAuth()
