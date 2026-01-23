@@ -1,42 +1,103 @@
 // Stub file - API integration pending
 
-export interface Kid {
-  id: string;
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  school?: string;
-  grade?: string;
-  avatar?: string;
-}
+// Re-export types from features for compatibility
+export type {
+  Child,
+  ChildSchool,
+  ChildTeacher,
+  Homework,
+  Grade,
+  ChildMedication,
+  ChildVaccination,
+  ChildAppointment,
+  ChildActivity,
+  ChildFriend,
+  ChildMilestone,
+  ChildChore,
+  GrowthRecord,
+} from '@/features/kids/types/kids.types';
 
-export interface KidActivity {
-  id: string;
-  kidId: string;
-  type: string;
-  description: string;
-  date: string;
-}
+import type {
+  Child,
+  ChildSchool,
+  ChildTeacher,
+  Homework,
+  Grade,
+  ChildMedication,
+  ChildVaccination,
+  ChildAppointment,
+  ChildActivity,
+  ChildFriend,
+  ChildMilestone,
+  ChildChore,
+  GrowthRecord,
+} from '@/features/kids/types/kids.types';
 
-export const mockKids: Kid[] = [];
-export const mockActivities: KidActivity[] = [];
+export const mockChildren: Child[] = [];
+export const mockSchools: ChildSchool[] = [];
+export const mockTeachers: ChildTeacher[] = [];
+export const mockHomework: Homework[] = [];
+export const mockGrades: Grade[] = [];
+export const mockMedications: ChildMedication[] = [];
+export const mockVaccinations: ChildVaccination[] = [];
+export const mockAppointments: ChildAppointment[] = [];
+export const mockActivities: ChildActivity[] = [];
+export const mockFriends: ChildFriend[] = [];
+export const mockMilestones: ChildMilestone[] = [];
+export const mockChores: ChildChore[] = [];
+export const mockGrowthRecords: GrowthRecord[] = [];
 
-export async function getKids(): Promise<Kid[]> {
+// Legacy aliases
+export const mockKids = mockChildren;
+
+export async function getKids(): Promise<Child[]> {
   return [];
 }
 
-export async function createKid(_data: Partial<Kid>): Promise<Kid> {
-  throw new Error('API integration required');
+export async function addChild(data: Omit<Child, 'id' | 'createdAt' | 'updatedAt'>): Promise<Child> {
+  return {
+    id: String(Date.now()),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    ...data,
+  };
 }
 
-export async function updateKid(_id: string, _data: Partial<Kid>): Promise<Kid> {
-  throw new Error('API integration required');
+export async function updateChild(id: string, data: Partial<Child>): Promise<Child> {
+  return {
+    id,
+    householdId: data.householdId || '',
+    firstName: data.firstName || '',
+    lastName: data.lastName || '',
+    dateOfBirth: data.dateOfBirth || '',
+    allergies: data.allergies || [],
+    medicalConditions: data.medicalConditions || [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    ...data,
+  };
 }
 
-export async function deleteKid(_id: string): Promise<void> {
+export async function deleteChild(_id: string): Promise<void> {
   return;
 }
 
-export async function getKidActivities(_kidId: string): Promise<KidActivity[]> {
+export async function deleteKid(_id: string): Promise<void> {
+  return deleteChild(_id);
+}
+
+export async function createKid(data: Partial<Child>): Promise<Child> {
+  return addChild(data as Omit<Child, 'id' | 'createdAt' | 'updatedAt'>);
+}
+
+export async function updateKid(id: string, data: Partial<Child>): Promise<Child> {
+  return updateChild(id, data);
+}
+
+export async function toggleChore(_choreId: string): Promise<ChildChore> {
+  throw new Error('API integration required');
+}
+
+export async function getKidActivities(_kidId: string): Promise<ChildActivity[]> {
   return [];
 }

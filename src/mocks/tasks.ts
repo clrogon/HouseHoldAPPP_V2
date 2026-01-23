@@ -1,5 +1,11 @@
 // Stub file - API integration pending
 
+export interface Subtask {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -8,8 +14,11 @@ export interface Task {
   priority: 'low' | 'medium' | 'high';
   dueDate?: string;
   assigneeId?: string;
-  assignee?: string;
+  assigneeName?: string;
   tags: string[];
+  subtasks: Subtask[];
+  createdBy: string;
+  householdId: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -36,7 +45,11 @@ export async function createTask(data: Partial<Task>): Promise<Task> {
     priority: data.priority || 'medium',
     dueDate: data.dueDate,
     assigneeId: data.assigneeId,
+    assigneeName: data.assigneeName,
     tags: data.tags || [],
+    subtasks: data.subtasks || [],
+    createdBy: data.createdBy || '',
+    householdId: data.householdId || '',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -50,6 +63,9 @@ export async function updateTask(id: string, data: Partial<Task>): Promise<Task>
     status: data.status || 'pending',
     priority: data.priority || 'medium',
     tags: data.tags || [],
+    subtasks: data.subtasks || [],
+    createdBy: data.createdBy || '',
+    householdId: data.householdId || '',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     ...data,

@@ -29,7 +29,7 @@ const taskSchema = z.object({
   title: z.string().min(1, 'Title is required').max(100),
   description: z.string().max(500).optional(),
   priority: z.enum(['low', 'medium', 'high']),
-  status: z.enum(['pending', 'in_progress', 'completed']),
+  status: z.enum(['pending', 'in_progress', 'completed', 'cancelled']),
   dueDate: z.string().optional(),
   assigneeId: z.string().optional(),
 });

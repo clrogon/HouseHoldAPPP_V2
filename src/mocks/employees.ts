@@ -1,29 +1,16 @@
 // Stub file - API integration pending
 
-export interface Employee {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email?: string;
-  phone?: string;
-  position: string;
-  department?: string;
-  salary: number;
-  payFrequency: string;
-  hireDate: string;
-  status: 'active' | 'inactive';
-}
+// Re-export types from features for compatibility
+export type { Employee, WorkSchedule, PayrollRecord, TimeEntry } from '@/features/employees/types/employees.types';
 
-export interface SalaryPayment {
-  id: string;
-  employeeId: string;
-  amount: number;
-  date: string;
-  period: string;
-}
+import type { Employee, PayrollRecord, TimeEntry } from '@/features/employees/types/employees.types';
 
 export const mockEmployees: Employee[] = [];
-export const mockPayments: SalaryPayment[] = [];
+export const mockPayrollRecords: PayrollRecord[] = [];
+export const mockTimeEntries: TimeEntry[] = [];
+
+// Legacy aliases
+export const mockPayments = mockPayrollRecords;
 
 export async function getEmployees(): Promise<Employee[]> {
   return [];
@@ -41,10 +28,14 @@ export async function deleteEmployee(_id: string): Promise<void> {
   return;
 }
 
-export async function getPayments(_employeeId: string): Promise<SalaryPayment[]> {
+export async function getPayments(_employeeId: string): Promise<PayrollRecord[]> {
   return [];
 }
 
-export async function recordPayment(_data: Partial<SalaryPayment>): Promise<SalaryPayment> {
+export async function recordPayment(_data: Partial<PayrollRecord>): Promise<PayrollRecord> {
+  throw new Error('API integration required');
+}
+
+export async function processPayroll(_employeeId: string): Promise<PayrollRecord> {
   throw new Error('API integration required');
 }

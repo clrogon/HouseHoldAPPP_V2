@@ -17,27 +17,31 @@ export interface DashboardStats {
 export interface Task {
   id: string;
   title: string;
-  status: string;
-  priority: string;
-  dueDate?: string;
-  assignee?: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  priority: 'low' | 'medium' | 'high';
+  dueDate: string;
+  assigneeName?: string;
 }
 
+// Dashboard-specific CalendarEvent with category support
 export interface CalendarEvent {
   id: string;
   title: string;
-  date: string;
-  type: string;
-  startTime?: string;
-  endTime?: string;
+  startDate: string;
+  allDay: boolean;
+  location?: string;
+  category: 'birthday' | 'appointment' | 'meeting' | 'holiday' | 'school' | 'sports' | 'other';
 }
+
+// Activity type with userName and message for ActivityWidget
+export type ActivityType = 'task_completed' | 'event_created' | 'expense_added' | 'member_joined' | 'item_low_stock';
 
 export interface Activity {
   id: string;
-  type: string;
-  description: string;
+  type: ActivityType;
+  userName: string;
+  message: string;
   timestamp: string;
-  user: string;
 }
 
 export interface BudgetCategory {

@@ -1,45 +1,31 @@
 // Stub file - API integration pending
 
-export interface Vehicle {
-  id: string;
-  type: string;
-  make: string;
-  model: string;
-  year: number;
-  color?: string;
-  licensePlate?: string;
-  mileage?: number;
-  ownerId?: string;
-}
+// Re-export types from features for compatibility
+export type { Vehicle, MaintenanceRecord, FuelRecord } from '@/features/vehicles/types/vehicles.types';
 
-export interface VehicleMaintenance {
-  id: string;
-  vehicleId: string;
-  type: string;
-  date: string;
-  cost?: number;
-  notes?: string;
-}
-
-export interface FuelLog {
-  id: string;
-  vehicleId: string;
-  date: string;
-  gallons: number;
-  totalCost: number;
-  mileage?: number;
-}
+import type { Vehicle, MaintenanceRecord, FuelRecord } from '@/features/vehicles/types/vehicles.types';
 
 export const mockVehicles: Vehicle[] = [];
-export const mockMaintenance: VehicleMaintenance[] = [];
-export const mockFuelLogs: FuelLog[] = [];
+export const mockMaintenanceRecords: MaintenanceRecord[] = [];
+export const mockFuelRecords: FuelRecord[] = [];
+
+// Legacy aliases
+export const mockMaintenance = mockMaintenanceRecords;
+export const mockFuelLogs = mockFuelRecords;
 
 export async function getVehicles(): Promise<Vehicle[]> {
   return [];
 }
 
-export async function createVehicle(_data: Partial<Vehicle>): Promise<Vehicle> {
-  throw new Error('API integration required');
+export async function addVehicle(data: Omit<Vehicle, 'id'>): Promise<Vehicle> {
+  return {
+    id: String(Date.now()),
+    ...data,
+  };
+}
+
+export async function createVehicle(data: Partial<Vehicle>): Promise<Vehicle> {
+  return addVehicle(data as Omit<Vehicle, 'id'>);
 }
 
 export async function updateVehicle(_id: string, _data: Partial<Vehicle>): Promise<Vehicle> {
@@ -50,18 +36,18 @@ export async function deleteVehicle(_id: string): Promise<void> {
   return;
 }
 
-export async function getMaintenanceHistory(_vehicleId: string): Promise<VehicleMaintenance[]> {
+export async function getMaintenanceHistory(_vehicleId: string): Promise<MaintenanceRecord[]> {
   return [];
 }
 
-export async function getFuelLogs(_vehicleId: string): Promise<FuelLog[]> {
+export async function getFuelLogs(_vehicleId: string): Promise<FuelRecord[]> {
   return [];
 }
 
-export async function addMaintenance(_data: Partial<VehicleMaintenance>): Promise<VehicleMaintenance> {
+export async function addMaintenance(_data: Partial<MaintenanceRecord>): Promise<MaintenanceRecord> {
   throw new Error('API integration required');
 }
 
-export async function addFuelLog(_data: Partial<FuelLog>): Promise<FuelLog> {
+export async function addFuelLog(_data: Partial<FuelRecord>): Promise<FuelRecord> {
   throw new Error('API integration required');
 }

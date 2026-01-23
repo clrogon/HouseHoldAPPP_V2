@@ -1,17 +1,9 @@
 // Stub file - API integration pending
 
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  description?: string;
-  startDate: string;
-  endDate: string;
-  allDay?: boolean;
-  location?: string;
-  category: string;
-  color?: string;
-  attendeeIds?: string[];
-}
+// Re-export types from features for compatibility
+export type { CalendarEvent, CalendarView } from '@/features/calendar/types/calendar.types';
+
+import type { CalendarEvent } from '@/features/calendar/types/calendar.types';
 
 export const mockEvents: CalendarEvent[] = [];
 

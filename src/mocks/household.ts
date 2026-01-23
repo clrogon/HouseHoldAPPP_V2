@@ -1,38 +1,15 @@
 // Stub file - API integration pending
 
-export interface HouseholdMember {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: 'ADMIN' | 'PARENT' | 'MEMBER' | 'STAFF';
-  avatar?: string;
-  phone?: string;
-  joinedAt: string;
-}
+// Re-export types from features for compatibility
+export type { Household, HouseholdMember, Invitation } from '@/features/household/types/household.types';
 
-export interface Household {
-  id: string;
-  name: string;
-  address?: string;
-  phone?: string;
-  members: HouseholdMember[];
-  createdAt: string;
-}
-
-export interface Invitation {
-  id: string;
-  email: string;
-  role: string;
-  status: 'pending' | 'accepted' | 'expired';
-  invitedAt: string;
-  expiresAt: string;
-}
+import type { Household, HouseholdMember, Invitation } from '@/features/household/types/household.types';
 
 export const mockHousehold: Household = {
   id: '1',
   name: 'My Household',
-  members: [],
+  memberCount: 0,
+  inviteCode: '',
   createdAt: new Date().toISOString(),
 };
 
@@ -51,8 +28,16 @@ export async function getMembers(): Promise<HouseholdMember[]> {
   return [];
 }
 
-export async function inviteMember(_data: { email: string; role: string }): Promise<Invitation> {
-  throw new Error('API integration required');
+export async function inviteMember(email: string, role: 'PARENT' | 'MEMBER' | 'STAFF'): Promise<Invitation> {
+  return {
+    id: String(Date.now()),
+    email,
+    role,
+    status: 'pending',
+    invitedBy: 'current-user',
+    invitedAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+  };
 }
 
 export async function removeMember(_id: string): Promise<void> {

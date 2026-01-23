@@ -1,35 +1,12 @@
 // Stub file - API integration pending
 
-export interface RecipeIngredient {
-  id: string;
-  name: string;
-  quantity: number;
-  unit: string;
-}
+// Re-export types from features for compatibility
+export type { Recipe, Ingredient, MealPlan } from '@/features/recipes/types/recipes.types';
 
-export interface RecipeInstruction {
-  id: string;
-  stepNumber: number;
-  text: string;
-  timer?: number;
-}
-
-export interface Recipe {
-  id: string;
-  name: string;
-  description?: string;
-  servings?: number;
-  prepTime?: number;
-  cookTime?: number;
-  difficulty?: string;
-  imageUrl?: string;
-  ingredients: RecipeIngredient[];
-  instructions: RecipeInstruction[];
-  tags: string[];
-  isFavorite?: boolean;
-}
+import type { Recipe, MealPlan } from '@/features/recipes/types/recipes.types';
 
 export const mockRecipes: Recipe[] = [];
+export const mockMealPlans: MealPlan[] = [];
 
 export const recipeTags = [
   'breakfast',
@@ -52,6 +29,13 @@ export async function getRecipeById(_id: string): Promise<Recipe | null> {
 
 export async function createRecipe(_data: Partial<Recipe>): Promise<Recipe> {
   throw new Error('API integration required');
+}
+
+export async function addRecipe(data: Omit<Recipe, 'id'>): Promise<Recipe> {
+  return {
+    id: String(Date.now()),
+    ...data,
+  };
 }
 
 export async function updateRecipe(_id: string, _data: Partial<Recipe>): Promise<Recipe> {

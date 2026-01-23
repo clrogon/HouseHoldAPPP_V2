@@ -1,27 +1,31 @@
 // Stub file - API integration pending
 
-export interface UserProfile {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phone?: string;
-  address?: string;
-  dateOfBirth?: string;
-  avatar?: string;
-  language: string;
-  timezone: string;
-  theme: string;
-}
+// Re-export types from features for compatibility
+export type { UserProfile, UserActivity, UserStats } from '@/features/profile/types/profile.types';
+
+import type { UserProfile, UserActivity, UserStats } from '@/features/profile/types/profile.types';
 
 export const mockProfile: UserProfile = {
   id: '1',
-  email: 'user@example.com',
   firstName: 'User',
   lastName: 'Name',
-  language: 'pt-PT',
-  timezone: 'Africa/Luanda',
-  theme: 'light',
+  email: 'user@example.com',
+  role: 'ADMIN',
+  householdId: '1',
+  householdName: 'My Household',
+  joinedAt: new Date().toISOString(),
+  lastActive: new Date().toISOString(),
+};
+
+export const mockActivities: UserActivity[] = [];
+
+export const mockStats: UserStats = {
+  tasksCompleted: 0,
+  tasksAssigned: 0,
+  eventsCreated: 0,
+  recipesAdded: 0,
+  inventoryItems: 0,
+  totalExpenses: 0,
 };
 
 export async function getProfile(): Promise<UserProfile> {

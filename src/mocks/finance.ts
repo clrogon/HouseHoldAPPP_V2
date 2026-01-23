@@ -1,14 +1,9 @@
 // Stub file - API integration pending
 
-export interface Transaction {
-  id: string;
-  type: 'income' | 'expense';
-  amount: number;
-  category: string;
-  description?: string;
-  date: string;
-  paymentMethod?: string;
-}
+// Re-export types from features for compatibility
+export type { BudgetCategory, Transaction, Bill, FinanceSummary } from '@/features/finance/types/finance.types';
+
+import type { BudgetCategory, Transaction, Bill, FinanceSummary } from '@/features/finance/types/finance.types';
 
 export interface Budget {
   id: string;
@@ -19,26 +14,10 @@ export interface Budget {
   categories: BudgetCategory[];
 }
 
-export interface BudgetCategory {
-  id: string;
-  name: string;
-  budgeted: number;
-  spent: number;
-}
-
-export interface Bill {
-  id: string;
-  name: string;
-  amount: number;
-  dueDate: string;
-  paid: boolean;
-  category: string;
-  isRecurring: boolean;
-}
-
 export const mockTransactions: Transaction[] = [];
 export const mockBudgets: Budget[] = [];
 export const mockBills: Bill[] = [];
+export const mockBudgetCategories: BudgetCategory[] = [];
 
 export const expenseCategories = [
   'Food & Groceries',
@@ -67,6 +46,13 @@ export async function createTransaction(_data: Partial<Transaction>): Promise<Tr
   throw new Error('API integration required');
 }
 
+export async function addTransaction(data: Omit<Transaction, 'id'>): Promise<Transaction> {
+  return {
+    id: String(Date.now()),
+    ...data,
+  };
+}
+
 export async function updateTransaction(_id: string, _data: Partial<Transaction>): Promise<Transaction> {
   throw new Error('API integration required');
 }
@@ -93,4 +79,19 @@ export async function createBill(_data: Partial<Bill>): Promise<Bill> {
 
 export async function markBillPaid(_id: string): Promise<Bill> {
   throw new Error('API integration required');
+}
+
+export async function markBillAsPaid(_id: string): Promise<Bill> {
+  return markBillPaid(_id);
+}
+
+export async function getFinanceSummary(): Promise<FinanceSummary> {
+  return {
+    totalIncome: 0,
+    totalExpenses: 0,
+    totalBudget: 0,
+    totalSpent: 0,
+    savingsRate: 0,
+    upcomingBills: 0,
+  };
 }

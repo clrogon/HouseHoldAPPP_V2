@@ -1,56 +1,28 @@
 // Stub file - API integration pending
 
-export interface AdminUser {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  status: 'active' | 'inactive' | 'suspended';
-  lastLoginAt?: string;
-  createdAt: string;
-}
+// Re-export types from features for compatibility
+export type { SystemUser, SystemHousehold, AuditLog, SystemStats } from '@/features/admin/types/admin.types';
 
-export interface AdminHousehold {
-  id: string;
-  name: string;
-  memberCount: number;
-  createdAt: string;
-  status: 'active' | 'inactive';
-}
+import type { SystemUser, SystemHousehold, AuditLog, SystemStats } from '@/features/admin/types/admin.types';
 
-export interface AuditLog {
-  id: string;
-  userId: string;
-  userEmail: string;
-  action: string;
-  resource: string;
-  timestamp: string;
-  details?: string;
-}
-
-export interface SystemStats {
-  totalUsers: number;
-  totalHouseholds: number;
-  activeUsers: number;
-  storageUsed: number;
-}
-
-export const mockAdminUsers: AdminUser[] = [];
-export const mockAdminHouseholds: AdminHousehold[] = [];
+// Empty arrays matching expected types
+export const mockUsers: SystemUser[] = [];
+export const mockHouseholds: SystemHousehold[] = [];
 export const mockAuditLogs: AuditLog[] = [];
-export const mockSystemStats: SystemStats = {
+export const mockStats: SystemStats = {
   totalUsers: 0,
-  totalHouseholds: 0,
   activeUsers: 0,
-  storageUsed: 0,
+  totalHouseholds: 0,
+  activeHouseholds: 0,
+  newUsersThisMonth: 0,
+  newHouseholdsThisMonth: 0,
 };
 
-export async function getAdminUsers(): Promise<AdminUser[]> {
+export async function getAdminUsers(): Promise<SystemUser[]> {
   return [];
 }
 
-export async function getAdminHouseholds(): Promise<AdminHousehold[]> {
+export async function getAdminHouseholds(): Promise<SystemHousehold[]> {
   return [];
 }
 
@@ -59,10 +31,10 @@ export async function getAuditLogs(): Promise<AuditLog[]> {
 }
 
 export async function getSystemStats(): Promise<SystemStats> {
-  return mockSystemStats;
+  return mockStats;
 }
 
-export async function updateUserStatus(_id: string, _status: string): Promise<AdminUser> {
+export async function updateUserStatus(_id: string, _status: SystemUser['status']): Promise<SystemUser> {
   throw new Error('API integration required');
 }
 

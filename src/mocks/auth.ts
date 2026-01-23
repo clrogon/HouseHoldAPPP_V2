@@ -1,5 +1,25 @@
 // Stub file - API integration pending
-import type { AuthResponse } from '@/features/auth/types/auth.types';
+
+export type UserRole = 'ADMIN' | 'PARENT' | 'MEMBER' | 'STAFF';
+
+export interface User {
+  id: string;
+  email: string;
+  role: UserRole;
+  firstName: string;
+  lastName: string;
+  avatar?: string;
+  phone?: string;
+  householdId?: string;
+  createdAt: string;
+  lastLoginAt?: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  token: string;
+  refreshToken?: string;
+}
 
 export async function mockLogin(_email: string, _password: string): Promise<AuthResponse> {
   // This will be replaced with real API call
