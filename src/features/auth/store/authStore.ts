@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User, LoginCredentials, RegisterData } from '../types/auth.types';
-import { mockLogin, mockRegister, mockLogout } from '@/mocks/auth';
+import { authApi } from '@/shared/api';
 
 interface AuthStore {
   // State
   user: User | null;
   token: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -25,6 +26,7 @@ export const useAuthStore = create<AuthStore>()(
       // Initial state
       user: null,
       token: null,
+      refreshToken: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -34,11 +36,12 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
 
         try {
-          const response = await mockLogin(credentials.email, credentials.password);
+          const response = await authApi.login(credentials.email, credentials.password);
 
           set({
             user: response.user,
             token: response.token,
+            refreshToken: response.refreshToken || null,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -57,18 +60,18 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
 
         try {
-          const response = await mockRegister({
+          const response = await authApi.register({
             email: data.email,
             password: data.password,
             firstName: data.firstName,
             lastName: data.lastName,
-            phone: data.phone,
             householdName: data.householdName,
           });
 
           set({
             user: response.user,
             token: response.token,
+            refreshToken: response.refreshToken || null,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -87,11 +90,12 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true });
 
         try {
-          await mockLogout();
+          await authApi.logout();
         } finally {
           set({
             user: null,
             token: null,
+            refreshToken: null,
             isAuthenticated: false,
             isLoading: false,
             error: null,
@@ -114,6 +118,7 @@ export const useAuthStore = create<AuthStore>()(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
+        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
     }
