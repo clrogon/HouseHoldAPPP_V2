@@ -20,10 +20,14 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:reset": "prisma migrate reset --force",
     "prisma:studio": "prisma studio",
     "db:seed": "ts-node prisma/seed.ts",
+    "db:reset": "npm run prisma:migrate:reset && npm run db:seed",
+    "db:fresh": "npm run docker:reset && npm run prisma:migrate && npm run db:seed",
     "docker:up": "docker-compose -f docker/docker-compose.yml up -d",
     "docker:down": "docker-compose -f docker/docker-compose.yml down",
+    "docker:reset": "docker-compose -f docker/docker-compose.yml down -v && docker-compose -f docker/docker-compose.yml up -d",
     "docker:logs": "docker-compose -f docker/docker-compose.yml logs -f"
   },
   "prisma": {
