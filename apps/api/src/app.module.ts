@@ -7,6 +7,14 @@ import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { HouseholdModule } from './modules/household/household.module';
+import { FinanceModule } from './modules/finance/finance.module';
+import { TasksModule } from './modules/tasks/tasks.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
+import { CalendarModule } from './modules/calendar/calendar.module';
+import { VehiclesModule } from './modules/vehicles/vehicles.module';
+import { PetsModule } from './modules/pets/pets.module';
+import { EmployeesModule } from './modules/employees/employees.module';
+import { RecipesModule } from './modules/recipes/recipes.module';
 import { JwtAuthGuard } from './common/guards';
 import {
   appConfig,
@@ -26,6 +34,14 @@ import {
     AuthModule,
     UsersModule,
     HouseholdModule,
+    FinanceModule,
+    TasksModule,
+    InventoryModule,
+    CalendarModule,
+    VehiclesModule,
+    PetsModule,
+    EmployeesModule,
+    RecipesModule,
   ],
   controllers: [AppController],
   providers: [
