@@ -1,5 +1,6 @@
 import { CheckSquare, Calendar, Wallet, Package, TrendingUp, TrendingDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { formatCurrency } from '@/shared/lib/currency';
 import type { DashboardStats } from '@/mocks/dashboard';
 
 interface StatsCardsProps {
@@ -48,7 +49,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
           <div className="text-2xl font-bold">{budgetPercentage}%</div>
           <p className={`text-xs flex items-center gap-1 ${budgetStatus === 'warning' ? 'text-amber-500' : 'text-muted-foreground'}`}>
             {budgetStatus === 'warning' && <TrendingDown className="h-3 w-3" />}
-            ${stats.budgetUsed.toLocaleString()} of ${stats.budgetTotal.toLocaleString()}
+            {formatCurrency(stats.budgetUsed)} de {formatCurrency(stats.budgetTotal)}
           </p>
         </CardContent>
       </Card>

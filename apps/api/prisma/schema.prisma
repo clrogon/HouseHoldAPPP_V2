@@ -1,0 +1,934 @@
+// prisma/schema.prisma
+// Household Hero v2 - Complete Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Role {
+  ADMIN
+  PARENT
+  MEMBER
+  STAFF
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum EventCategory {
+  BIRTHDAY
+  APPOINTMENT
+  MEETING
+  HOLIDAY
+  SCHOOL
+  SPORTS
+  OTHER
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum BudgetPeriod {
+  WEEKLY
+  MONTHLY
+  YEARLY
+  CUSTOM
+}
+
+enum RecurrenceFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+  CUSTOM
+}
+
+enum PetSpecies {
+  DOG
+  CAT
+  BIRD
+  FISH
+  REPTILE
+  OTHER
+}
+
+enum VehicleType {
+  CAR
+  TRUCK
+  SUV
+  VAN
+  MOTORCYCLE
+  OTHER
+}
+
+// ============================================
+// AUTHENTICATION & USERS
+// ============================================
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(MEMBER)
+
+  profile   UserProfile?
+
+  createdHouseholds  Household[]       @relation("HouseholdCreator")
+  createdTasks       Task[]            @relation("TaskCreator")
+  assignedTasks      Task[]            @relation("TaskAssignee")
+  taskComments       TaskComment[]
+  createdEvents      Event[]
+  createdRecipes     Recipe[]
+  createdTransactions Transaction[]
+  createdBudgets     Budget[]
+
+  twoFactorSecret     String?
+  twoFactorEnabled    Boolean           @default(false)
+  backupCodes         String[]
+  failedLoginAttempts Int               @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+
+  sessions  Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@map("users")
+}
+
+model UserProfile {
+  id          String     @id @default(cuid())
+  userId      String     @unique
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  firstName   String
+  lastName    String
+  avatar      String?
+  dateOfBirth DateTime?
+  phone       String?
+  address     String?
+
+  householdId String?
+  household   Household? @relation(fields: [householdId], references: [id])
+
+  language    String     @default("en")
+  timezone    String     @default("UTC")
+  theme       String     @default("light")
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("user_profiles")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+  @@map("sessions")
+}
+
+// ============================================
+// HOUSEHOLD
+// ============================================
+
+model Household {
+  id        String   @id @default(cuid())
+  name      String
+  address   String?
+  phone     String?
+
+  creatorId String
+  creator   User     @relation("HouseholdCreator", fields: [creatorId], references: [id])
+  members   UserProfile[]
+  tasks     Task[]
+  events    Event[]
+  recipes   Recipe[]
+  inventoryCategories InventoryCategory[]
+  inventoryItems      InventoryItem[]
+  budgets   Budget[]
+  transactions Transaction[]
+  bills     Bill[]
+  employees Employee[]
+  vehicles  Vehicle[]
+  pets      Pet[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("households")
+}
+
+// ============================================
+// TASKS
+// ============================================
+
+model Task {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  priority    Priority    @default(MEDIUM)
+  status      TaskStatus  @default(PENDING)
+  dueDate     DateTime?
+
+  creatorId   String
+  creator     User        @relation("TaskCreator", fields: [creatorId], references: [id])
+
+  assigneeId  String?
+  assignee    User?       @relation("TaskAssignee", fields: [assigneeId], references: [id])
+
+  householdId String
+  household   Household   @relation(fields: [householdId], references: [id])
+
+  subtasks    Subtask[]
+  comments    TaskComment[]
+
+  templateId  String?
+  template    TaskTemplate? @relation(fields: [templateId], references: [id])
+
+  tags        String[]
+
+  isRecurring Boolean     @default(false)
+  recurrence  Recurrence?
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  completedAt DateTime?
+
+  @@index([status, dueDate])
+  @@index([assigneeId])
+  @@index([householdId])
+  @@map("tasks")
+}
+
+model Subtask {
+  id          String   @id @default(cuid())
+  title       String
+  completed   Boolean  @default(false)
+  order       Int
+
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("subtasks")
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  content   String
+
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([taskId])
+  @@map("task_comments")
+}
+
+model TaskTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  priority    Priority @default(MEDIUM)
+  tags        String[]
+
+  tasks       Task[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("task_templates")
+}
+
+model Recurrence {
+  id        String              @id @default(cuid())
+  frequency RecurrenceFrequency
+  interval  Int                 @default(1)
+  endDate   DateTime?
+  daysOfWeek Int[]
+  dayOfMonth Int?
+
+  taskId    String @unique
+  task      Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("recurrences")
+}
+
+// ============================================
+// CALENDAR
+// ============================================
+
+model Event {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  allDay      Boolean       @default(false)
+  location    String?
+  category    EventCategory @default(OTHER)
+  color       String?
+
+  creatorId   String
+  creator     User          @relation(fields: [creatorId], references: [id])
+
+  householdId String
+  household   Household     @relation(fields: [householdId], references: [id])
+
+  isRecurring Boolean       @default(false)
+  recurrenceRule String?
+  googleEventId String?
+  attendeeIds String[]
+  reminders   Int[]
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([startDate, endDate])
+  @@index([householdId])
+  @@map("events")
+}
+
+// ============================================
+// INVENTORY
+// ============================================
+
+model InventoryCategory {
+  id          String   @id @default(cuid())
+  name        String
+  icon        String?
+  color       String?
+  order       Int      @default(0)
+
+  parentId    String?
+  parent      InventoryCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    InventoryCategory[] @relation("CategoryHierarchy")
+
+  householdId String
+  household   Household           @relation(fields: [householdId], references: [id])
+  items       InventoryItem[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([householdId])
+  @@index([parentId])
+  @@map("inventory_categories")
+}
+
+model InventoryItem {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  quantity    Float
+  unit        String
+  location    String?
+
+  purchaseDate  DateTime?
+  purchasePrice Float?
+  expiryDate    DateTime?
+
+  lowStockThreshold Float?
+  barcode           String?
+  sku               String?
+  photos      String[]
+
+  categoryId  String
+  category    InventoryCategory @relation(fields: [categoryId], references: [id])
+
+  householdId String
+  household   Household         @relation(fields: [householdId], references: [id])
+
+  onShoppingList Boolean @default(false)
+  stockHistory StockHistory[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([householdId])
+  @@index([categoryId])
+  @@index([expiryDate])
+  @@map("inventory_items")
+}
+
+model StockHistory {
+  id          String   @id @default(cuid())
+  itemId      String
+  item        InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  quantityChange Float
+  reason         String?
+  notes          String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([itemId])
+  @@map("stock_history")
+}
+
+// ============================================
+// FINANCE
+// ============================================
+
+model Budget {
+  id          String       @id @default(cuid())
+  name        String
+  period      BudgetPeriod
+  startDate   DateTime
+  endDate     DateTime
+  categories  BudgetCategory[]
+  totalBudgeted Float
+
+  creatorId   String
+  creator     User         @relation(fields: [creatorId], references: [id])
+
+  householdId String
+  household   Household    @relation(fields: [householdId], references: [id])
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([householdId, startDate])
+  @@map("budgets")
+}
+
+model BudgetCategory {
+  id        String @id @default(cuid())
+  name      String
+  budgeted  Float
+  spent     Float  @default(0)
+
+  budgetId  String
+  budget    Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("budget_categories")
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  type        TransactionType
+  amount      Float
+  category    String
+  description String?
+  date        DateTime
+  paymentMethod String?
+  isRecurring Boolean @default(false)
+  recurrence  String?
+  receiptUrl  String?
+
+  creatorId   String
+  creator     User      @relation(fields: [creatorId], references: [id])
+
+  householdId String
+  household   Household @relation(fields: [householdId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([householdId, date])
+  @@index([category])
+  @@map("transactions")
+}
+
+model Bill {
+  id          String   @id @default(cuid())
+  name        String
+  amount      Float
+  category    String
+  dueDate     DateTime
+  paid        Boolean  @default(false)
+  paidDate    DateTime?
+  isRecurring Boolean  @default(false)
+  frequency   RecurrenceFrequency?
+  autoPay     Boolean  @default(false)
+  notes       String?
+
+  householdId String
+  household   Household @relation(fields: [householdId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([householdId, dueDate])
+  @@index([paid])
+  @@map("bills")
+}
+
+// ============================================
+// EMPLOYEES
+// ============================================
+
+model Employee {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  address     String?
+  position    String
+  department  String?
+  employmentType String
+  salary         Float
+  payFrequency   String
+  hireDate       DateTime
+  terminationDate DateTime?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  photo       String?
+
+  householdId String
+  household   Household       @relation(fields: [householdId], references: [id])
+
+  payments    SalaryPayment[]
+  vacations   EmployeeVacation[]
+  documents   EmployeeDocument[]
+  notes       EmployeeNote[]
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([householdId])
+  @@map("employees")
+}
+
+model SalaryPayment {
+  id          String   @id @default(cuid())
+  amount      Float
+  paymentDate DateTime
+  period      String
+  paymentMethod String?
+  notes       String?
+
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@index([employeeId, paymentDate])
+  @@map("salary_payments")
+}
+
+model EmployeeVacation {
+  id          String   @id @default(cuid())
+  startDate   DateTime
+  endDate     DateTime
+  days        Int
+  approved    Boolean  @default(false)
+  notes       String?
+
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("employee_vacations")
+}
+
+model EmployeeDocument {
+  id          String   @id @default(cuid())
+  name        String
+  type        String
+  url         String
+  uploadedAt  DateTime @default(now())
+
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("employee_documents")
+}
+
+model EmployeeNote {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  type        String
+
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("employee_notes")
+}
+
+// ============================================
+// VEHICLES
+// ============================================
+
+model Vehicle {
+  id          String      @id @default(cuid())
+  type        VehicleType
+  make        String
+  model       String
+  year        Int
+  color       String?
+  vin         String?
+  licensePlate String?
+  mileage     Int?
+  purchaseDate  DateTime?
+  purchasePrice Float?
+  currentValue  Float?
+  ownerId     String?
+  insurance   VehicleInsurance?
+
+  householdId String
+  household   Household           @relation(fields: [householdId], references: [id])
+
+  maintenance VehicleMaintenance[]
+  fuelLogs    FuelLog[]
+  expenses    VehicleExpense[]
+  photos      String[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([householdId])
+  @@map("vehicles")
+}
+
+model VehicleInsurance {
+  id          String   @id @default(cuid())
+  provider    String
+  policyNumber String
+  coverageType String
+  premium     Float
+  startDate   DateTime
+  expiryDate  DateTime
+  policyDocumentUrl String?
+
+  vehicleId   String   @unique
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("vehicle_insurance")
+}
+
+model VehicleMaintenance {
+  id          String   @id @default(cuid())
+  type        String
+  date        DateTime
+  mileage     Int?
+  cost        Float?
+  serviceProvider String?
+  notes       String?
+  nextServiceDue  DateTime?
+
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([vehicleId, date])
+  @@map("vehicle_maintenance")
+}
+
+model FuelLog {
+  id          String   @id @default(cuid())
+  date        DateTime
+  gallons     Float
+  costPerGallon Float
+  totalCost   Float
+  mileage     Int?
+  fuelType    String?
+  gasStation  String?
+
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@index([vehicleId, date])
+  @@map("fuel_logs")
+}
+
+model VehicleExpense {
+  id          String   @id @default(cuid())
+  date        DateTime
+  category    String
+  amount      Float
+  description String?
+
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@index([vehicleId, date])
+  @@map("vehicle_expenses")
+}
+
+// ============================================
+// PETS
+// ============================================
+
+model Pet {
+  id          String      @id @default(cuid())
+  name        String
+  species     PetSpecies
+  breed       String?
+  birthDate   DateTime?
+  gender      String?
+  color       String?
+  microchipNumber String?
+  weight      Float?
+  vetName     String?
+  vetPhone    String?
+  vetAddress  String?
+
+  householdId String
+  household   Household   @relation(fields: [householdId], references: [id])
+
+  vaccinations  PetVaccination[]
+  appointments  PetAppointment[]
+  medications   PetMedication[]
+  weightHistory PetWeightHistory[]
+  expenses      PetExpense[]
+  photos      String[]
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([householdId])
+  @@map("pets")
+}
+
+model PetVaccination {
+  id          String   @id @default(cuid())
+  name        String
+  dateGiven   DateTime
+  nextDue     DateTime
+  vet         String?
+  certificateUrl String?
+
+  petId       String
+  pet         Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([petId, nextDue])
+  @@map("pet_vaccinations")
+}
+
+model PetAppointment {
+  id          String   @id @default(cuid())
+  date        DateTime
+  reason      String
+  vet         String?
+  notes       String?
+  cost        Float?
+
+  petId       String
+  pet         Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([petId, date])
+  @@map("pet_appointments")
+}
+
+model PetMedication {
+  id          String    @id @default(cuid())
+  name        String
+  dosage      String
+  frequency   String
+  startDate   DateTime
+  endDate     DateTime?
+  prescribedBy String?
+  notes       String?
+
+  petId       String
+  pet         Pet       @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([petId])
+  @@map("pet_medications")
+}
+
+model PetWeightHistory {
+  id        String   @id @default(cuid())
+  date      DateTime
+  weight    Float
+  notes     String?
+
+  petId     String
+  pet       Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([petId, date])
+  @@map("pet_weight_history")
+}
+
+model PetExpense {
+  id          String   @id @default(cuid())
+  date        DateTime
+  category    String
+  amount      Float
+  description String?
+
+  petId       String
+  pet         Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@index([petId, date])
+  @@map("pet_expenses")
+}
+
+// ============================================
+// RECIPES
+// ============================================
+
+model Recipe {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  servings    Int?
+  prepTime    Int?
+  cookTime    Int?
+  difficulty  String?
+  imageUrl    String?
+  source      String?
+
+  creatorId   String
+  creator     User             @relation(fields: [creatorId], references: [id])
+
+  householdId String
+  household   Household        @relation(fields: [householdId], references: [id])
+
+  ingredients RecipeIngredient[]
+  instructions RecipeInstruction[]
+  tags        String[]
+  calories    Int?
+  protein     Float?
+  carbs       Float?
+  fat         Float?
+  favoriteBy  String[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([householdId])
+  @@map("recipes")
+}
+
+model RecipeIngredient {
+  id        String   @id @default(cuid())
+  name      String
+  quantity  Float
+  unit      String
+  order     Int
+
+  recipeId  String
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("recipe_ingredients")
+}
+
+model RecipeInstruction {
+  id        String   @id @default(cuid())
+  stepNumber Int
+  text      String
+  timer     Int?
+
+  recipeId  String
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("recipe_instructions")
+}
+
+// ============================================
+// AUDIT & NOTIFICATIONS
+// ============================================
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String
+  userEmail   String
+  action      String
+  resource    String
+  resourceId  String?
+  details     Json?
+  ipAddress   String?
+  userAgent   String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([resource, resourceId])
+  @@index([action])
+  @@map("audit_logs")
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String
+  title       String
+  message     String
+  read        Boolean  @default(false)
+  actionUrl   String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId, read])
+  @@index([createdAt])
+  @@map("notifications")
+}

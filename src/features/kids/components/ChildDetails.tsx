@@ -1,4 +1,5 @@
 import { ArrowLeft, BookOpen, GraduationCap, Heart, Users, Trophy, CheckSquare, TrendingUp } from 'lucide-react';
+import { formatCurrency } from '@/shared/lib/currency';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Badge } from '@/shared/components/ui/badge';
@@ -451,7 +452,7 @@ export function ChildDetails({
                         </p>
                       )}
                       {activity.cost && (
-                        <p className="text-sm font-medium mt-2">${activity.cost}/season</p>
+                        <p className="text-sm font-medium mt-2">{formatCurrency(activity.cost)}/temporada</p>
                       )}
                     </div>
                   ))}
@@ -528,7 +529,7 @@ export function ChildDetails({
                         </div>
                       </div>
                       {chore.allowanceAmount && (
-                        <Badge variant="outline">${chore.allowanceAmount}</Badge>
+                        <Badge variant="outline">{formatCurrency(chore.allowanceAmount)}</Badge>
                       )}
                     </div>
                   ))}

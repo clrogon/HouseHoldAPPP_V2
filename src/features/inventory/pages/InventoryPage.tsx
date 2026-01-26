@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Search, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Input } from '@/shared/components/ui/input';
@@ -9,13 +9,9 @@ import { InventoryList } from '../components/InventoryList';
 import { ShoppingList } from '../components/ShoppingList';
 import { AddItemDialog } from '../components/AddItemDialog';
 import type { InventoryItem, InventoryCategory, ShoppingListItem } from '../types/inventory.types';
+import { inventoryApi } from '@/shared/api';
 import {
-  mockCategories,
-  mockItems,
   mockShoppingList,
-  updateItem,
-  deleteItem,
-  addItem,
   addToShoppingList,
   toggleShoppingItem,
   removeFromShoppingList,
@@ -28,16 +24,44 @@ export function InventoryPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const categoriesRef = useRef<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
-    // Load mock data
-    setIsLoading(true);
-    setTimeout(() => {
-      setCategories(mockCategories);
-      setItems(mockItems);
-      setShoppingList(mockShoppingList);
-      setIsLoading(false);
-    }, 300);
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [categoriesData, itemsData] = await Promise.all([
+          inventoryApi.getCategories(),
+          inventoryApi.getItems(),
+        ]);
+        categoriesRef.current = categoriesData.map(c => ({ id: c.id, name: c.name }));
+        setCategories(categoriesData.map(c => ({
+          id: c.id,
+          name: c.name,
+          icon: c.icon || 'Package',
+          color: c.color || 'bg-gray-100',
+          count: itemsData.filter(i => i.categoryId === c.id).length,
+        })));
+        setItems(itemsData.map(i => ({
+          id: i.id,
+          name: i.name,
+          category: categoriesData.find(c => c.id === i.categoryId)?.name || 'Uncategorized',
+          quantity: i.quantity,
+          unit: i.unit,
+          minQuantity: i.lowStockThreshold || 0,
+          location: i.location || '',
+          expirationDate: i.expiryDate,
+          lastUpdated: i.updatedAt,
+        })));
+        setShoppingList(mockShoppingList);
+      } catch (error) {
+        console.error('Failed to fetch inventory data:', error);
+        setShoppingList(mockShoppingList);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   const filteredItems = useMemo(() => {
@@ -68,11 +92,15 @@ export function InventoryPage() {
     const item = items.find(i => i.id === id);
     if (!item) return;
 
-    const newQuantity = Math.max(0, item.quantity + change);
-    await updateItem(id, { quantity: newQuantity });
-    setItems(prev =>
-      prev.map(i => (i.id === id ? { ...i, quantity: newQuantity } : i))
-    );
+    try {
+      const newQuantity = Math.max(0, item.quantity + change);
+      await inventoryApi.updateStock(id, change, 'Manual adjustment');
+      setItems(prev =>
+        prev.map(i => (i.id === id ? { ...i, quantity: newQuantity } : i))
+      );
+    } catch (error) {
+      console.error('Failed to update quantity:', error);
+    }
   };
 
   const handleAddToShoppingList = async (item: InventoryItem) => {
@@ -93,13 +121,45 @@ export function InventoryPage() {
   };
 
   const handleDeleteItem = async (id: string) => {
-    await deleteItem(id);
-    setItems(prev => prev.filter(i => i.id !== id));
+    try {
+      await inventoryApi.deleteItem(id);
+      setItems(prev => prev.filter(i => i.id !== id));
+    } catch (error) {
+      console.error('Failed to delete item:', error);
+    }
   };
 
   const handleAddItem = async (itemData: Omit<InventoryItem, 'id'>) => {
-    const newItem = await addItem(itemData);
-    setItems(prev => [...prev, newItem]);
+    try {
+      const categoryId = categoriesRef.current.find(c => c.name === itemData.category)?.id;
+      if (!categoryId) {
+        console.error('Category not found');
+        return;
+      }
+      const created = await inventoryApi.createItem({
+        name: itemData.name,
+        quantity: itemData.quantity,
+        unit: itemData.unit,
+        location: itemData.location,
+        lowStockThreshold: itemData.minQuantity,
+        expiryDate: itemData.expirationDate,
+        categoryId,
+      });
+      const newItem: InventoryItem = {
+        id: created.id,
+        name: created.name,
+        category: itemData.category,
+        quantity: created.quantity,
+        unit: created.unit,
+        minQuantity: created.lowStockThreshold || 0,
+        location: created.location || '',
+        expirationDate: created.expiryDate,
+        lastUpdated: created.updatedAt,
+      };
+      setItems(prev => [...prev, newItem]);
+    } catch (error) {
+      console.error('Failed to add item:', error);
+    }
   };
 
   const handleToggleShoppingItem = async (id: string) => {

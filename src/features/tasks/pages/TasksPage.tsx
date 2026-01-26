@@ -1,23 +1,61 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { List, LayoutGrid, Calendar } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
 import { TaskListView } from '../components/TaskListView';
 import { TaskKanbanView } from '../components/TaskKanbanView';
+import { TaskCalendarView } from '../components/TaskCalendarView';
 import { TaskFiltersComponent, type TaskFilters } from '../components/TaskFilters';
 import { CreateTaskDialog } from '../components/CreateTaskDialog';
-import { mockTasks, taskTags, createTask, type Task } from '@/mocks/tasks';
+import { EditTaskDialog } from '../components/EditTaskDialog';
+import { tasksApi } from '@/shared/api';
+import { taskTags, type Task } from '@/mocks/tasks';
 
 type ViewMode = 'list' | 'kanban' | 'calendar';
 
 export function TasksPage() {
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [filters, setFilters] = useState<TaskFilters>({
     search: '',
     status: [],
     priority: [],
     assignee: '',
   });
+
+  // Fetch tasks from API
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        setLoading(true);
+        const data = await tasksApi.getTasks();
+        // Map API response to local Task type
+        const mappedTasks: Task[] = data.map((t) => ({
+          id: t.id,
+          title: t.title,
+          description: t.description,
+          status: t.status.toLowerCase() as Task['status'],
+          priority: t.priority.toLowerCase() as Task['priority'],
+          dueDate: t.dueDate,
+          assigneeId: t.assigneeId,
+          assigneeName: undefined, // API doesn't return assignee name
+          tags: t.tags || [],
+          subtasks: [],
+          createdBy: t.creatorId,
+          householdId: t.householdId,
+          createdAt: t.createdAt,
+          updatedAt: t.updatedAt,
+        }));
+        setTasks(mappedTasks);
+      } catch (error) {
+        console.error('Failed to fetch tasks:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTasks();
+  }, []);
 
   // Get unique assignees from tasks
   const assignees = useMemo(() => {
@@ -63,18 +101,51 @@ export function TasksPage() {
   }, [tasks, filters]);
 
   const handleStatusChange = async (taskId: string, status: Task['status']) => {
-    setTasks(tasks.map(task =>
-      task.id === taskId ? { ...task, status, updatedAt: new Date().toISOString() } : task
-    ));
+    try {
+      await tasksApi.updateTask(taskId, { status: status.toUpperCase() as 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' });
+      setTasks(tasks.map(task =>
+        task.id === taskId ? { ...task, status, updatedAt: new Date().toISOString() } : task
+      ));
+    } catch (error) {
+      console.error('Failed to update task status:', error);
+    }
   };
 
   const handleEditTask = (task: Task) => {
-    // In a real app, this would open an edit dialog
-    console.log('Edit task:', task);
+    setEditingTask(task);
+  };
+
+  const handleSaveTask = async (updatedTask: Task) => {
+    try {
+      const saved = await tasksApi.updateTask(updatedTask.id, {
+        title: updatedTask.title,
+        description: updatedTask.description,
+        priority: updatedTask.priority.toUpperCase() as 'LOW' | 'MEDIUM' | 'HIGH',
+        status: updatedTask.status.toUpperCase() as 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED',
+        dueDate: updatedTask.dueDate,
+        assigneeId: updatedTask.assigneeId,
+        tags: updatedTask.tags,
+      });
+      const mappedTask: Task = {
+        ...updatedTask,
+        id: saved.id,
+        status: saved.status.toLowerCase() as Task['status'],
+        priority: saved.priority.toLowerCase() as Task['priority'],
+        updatedAt: saved.updatedAt,
+      };
+      setTasks(tasks.map(t => t.id === mappedTask.id ? mappedTask : t));
+    } catch (error) {
+      console.error('Failed to update task:', error);
+    }
   };
 
   const handleDeleteTask = async (taskId: string) => {
-    setTasks(tasks.filter(task => task.id !== taskId));
+    try {
+      await tasksApi.deleteTask(taskId);
+      setTasks(tasks.filter(task => task.id !== taskId));
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+    }
   };
 
   const handleTaskClick = (task: Task) => {
@@ -83,8 +154,36 @@ export function TasksPage() {
   };
 
   const handleCreateTask = async (newTask: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const task = await createTask(newTask);
-    setTasks([task, ...tasks]);
+    try {
+      const created = await tasksApi.createTask({
+        title: newTask.title,
+        description: newTask.description,
+        priority: newTask.priority.toUpperCase() as 'LOW' | 'MEDIUM' | 'HIGH',
+        status: newTask.status.toUpperCase() as 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED',
+        dueDate: newTask.dueDate,
+        assigneeId: newTask.assigneeId,
+        tags: newTask.tags,
+      });
+      const task: Task = {
+        id: created.id,
+        title: created.title,
+        description: created.description,
+        status: created.status.toLowerCase() as Task['status'],
+        priority: created.priority.toLowerCase() as Task['priority'],
+        dueDate: created.dueDate,
+        assigneeId: created.assigneeId,
+        assigneeName: newTask.assigneeName,
+        tags: created.tags || [],
+        subtasks: [],
+        createdBy: created.creatorId,
+        householdId: created.householdId,
+        createdAt: created.createdAt,
+        updatedAt: created.updatedAt,
+      };
+      setTasks([task, ...tasks]);
+    } catch (error) {
+      console.error('Failed to create task:', error);
+    }
   };
 
   return (
@@ -132,7 +231,7 @@ export function TasksPage() {
 
       {/* Task Count */}
       <div className="text-sm text-muted-foreground">
-        Showing {filteredTasks.length} of {tasks.length} tasks
+        {loading ? 'Loading tasks...' : `Showing ${filteredTasks.length} of ${tasks.length} tasks`}
       </div>
 
       {/* Task Views */}
@@ -157,13 +256,25 @@ export function TasksPage() {
       )}
 
       {viewMode === 'calendar' && (
-        <div className="flex items-center justify-center h-[400px] border rounded-lg bg-muted/50">
-          <div className="text-center text-muted-foreground">
-            <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>Calendar view coming soon</p>
-            <p className="text-sm">Tasks will be displayed on a calendar by due date</p>
-          </div>
-        </div>
+        <TaskCalendarView
+          tasks={filteredTasks}
+          onStatusChange={handleStatusChange}
+          onEdit={handleEditTask}
+          onDelete={handleDeleteTask}
+          onClick={handleTaskClick}
+        />
+      )}
+
+      {/* Edit Task Dialog */}
+      {editingTask && (
+        <EditTaskDialog
+          task={editingTask}
+          open={!!editingTask}
+          onOpenChange={(open) => !open && setEditingTask(null)}
+          assignees={assignees}
+          availableTags={taskTags}
+          onSave={handleSaveTask}
+        />
       )}
     </div>
   );

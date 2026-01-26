@@ -1,137 +1,36 @@
-import type { User, AuthResponse } from '@/features/auth/types/auth.types';
+// Stub file - API integration pending
 
-export const mockUsers: User[] = [
-  {
-    id: '1',
-    email: 'admin@household.com',
-    role: 'ADMIN',
-    firstName: 'Admin',
-    lastName: 'User',
-    avatar: undefined,
-    phone: '555-0100',
-    householdId: '1',
-    createdAt: '2024-01-01T00:00:00Z',
-    lastLoginAt: '2024-03-15T10:30:00Z',
-  },
-  {
-    id: '2',
-    email: 'parent@household.com',
-    role: 'PARENT',
-    firstName: 'John',
-    lastName: 'Smith',
-    avatar: undefined,
-    phone: '555-0101',
-    householdId: '1',
-    createdAt: '2024-01-01T00:00:00Z',
-    lastLoginAt: '2024-03-14T08:00:00Z',
-  },
-  {
-    id: '3',
-    email: 'member@household.com',
-    role: 'MEMBER',
-    firstName: 'Tommy',
-    lastName: 'Smith',
-    avatar: undefined,
-    phone: '555-0102',
-    householdId: '1',
-    createdAt: '2024-01-05T00:00:00Z',
-    lastLoginAt: '2024-03-13T16:45:00Z',
-  },
-  {
-    id: '4',
-    email: 'staff@household.com',
-    role: 'STAFF',
-    firstName: 'Maria',
-    lastName: 'Garcia',
-    avatar: undefined,
-    phone: '555-0103',
-    householdId: '1',
-    createdAt: '2024-02-01T00:00:00Z',
-    lastLoginAt: '2024-03-15T07:00:00Z',
-  },
-];
+export type UserRole = 'ADMIN' | 'PARENT' | 'MEMBER' | 'STAFF';
 
-// Simulate network delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-export async function mockLogin(email: string, password: string): Promise<AuthResponse> {
-  await delay(800); // Simulate API delay
-
-  const user = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-
-  if (!user) {
-    throw new Error('User not found');
-  }
-
-  // For mock purposes, any password works except 'wrong'
-  if (password === 'wrong') {
-    throw new Error('Invalid password');
-  }
-
-  return {
-    user: {
-      ...user,
-      lastLoginAt: new Date().toISOString(),
-    },
-    token: `mock-jwt-token-${user.id}-${Date.now()}`,
-    refreshToken: `mock-refresh-token-${user.id}-${Date.now()}`,
-  };
-}
-
-export async function mockRegister(data: {
+export interface User {
+  id: string;
   email: string;
-  password: string;
+  role: UserRole;
   firstName: string;
   lastName: string;
+  avatar?: string;
   phone?: string;
-  householdName?: string;
-}): Promise<AuthResponse> {
-  await delay(1000); // Simulate API delay
-
-  // Check if email already exists
-  const existingUser = mockUsers.find(
-    u => u.email.toLowerCase() === data.email.toLowerCase()
-  );
-
-  if (existingUser) {
-    throw new Error('Email already registered');
-  }
-
-  const newUser: User = {
-    id: String(mockUsers.length + 1),
-    email: data.email,
-    role: 'PARENT', // New users start as PARENT
-    firstName: data.firstName,
-    lastName: data.lastName,
-    phone: data.phone,
-    householdId: String(Date.now()), // New household
-    createdAt: new Date().toISOString(),
-    lastLoginAt: new Date().toISOString(),
-  };
-
-  // Add to mock users (in a real app, this would be persisted)
-  mockUsers.push(newUser);
-
-  return {
-    user: newUser,
-    token: `mock-jwt-token-${newUser.id}-${Date.now()}`,
-    refreshToken: `mock-refresh-token-${newUser.id}-${Date.now()}`,
-  };
+  householdId?: string;
+  createdAt: string;
+  lastLoginAt?: string;
 }
 
-export async function mockLogout(): Promise<void> {
-  await delay(300);
-  // In a real app, this would invalidate the token on the server
+export interface AuthResponse {
+  user: User;
+  token: string;
+  refreshToken?: string;
 }
 
-export async function mockRefreshToken(refreshToken: string): Promise<{ token: string }> {
-  await delay(200);
+export async function mockLogin(_email: string, _password: string): Promise<AuthResponse> {
+  // This will be replaced with real API call
+  throw new Error('API integration required - please connect to backend');
+}
 
-  if (!refreshToken.startsWith('mock-refresh-token')) {
-    throw new Error('Invalid refresh token');
-  }
+export async function mockRegister(_data: Record<string, unknown>): Promise<AuthResponse> {
+  // This will be replaced with real API call
+  throw new Error('API integration required - please connect to backend');
+}
 
-  return {
-    token: `mock-jwt-token-refreshed-${Date.now()}`,
-  };
+export async function mockLogout(): Promise<{ success: boolean }> {
+  return { success: true };
 }

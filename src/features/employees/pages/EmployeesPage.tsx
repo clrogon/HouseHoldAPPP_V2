@@ -7,12 +7,8 @@ import { EmployeeCard } from '../components/EmployeeCard';
 import { PayrollSummary } from '../components/PayrollSummary';
 import { ScheduleOverview } from '../components/ScheduleOverview';
 import type { Employee, PayrollRecord, TimeEntry } from '../types/employees.types';
-import {
-  mockEmployees,
-  mockPayrollRecords,
-  mockTimeEntries,
-  processPayroll,
-} from '@/mocks/employees';
+import { employeesApi } from '@/shared/api';
+import { mockPayrollRecords, mockTimeEntries, processPayroll } from '@/mocks/employees';
 
 export function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -23,13 +19,41 @@ export function EmployeesPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setEmployees(mockEmployees);
-      setPayrollRecords(mockPayrollRecords);
-      setTimeEntries(mockTimeEntries);
-      setIsLoading(false);
-    }, 300);
+    const fetchEmployees = async () => {
+      setIsLoading(true);
+      try {
+        const data = await employeesApi.getEmployees();
+        const mappedEmployees: Employee[] = data.map(e => ({
+          id: e.id,
+          firstName: e.firstName,
+          lastName: e.lastName,
+          email: e.email,
+          phone: e.phone,
+          address: e.address,
+          position: e.position,
+          department: e.department,
+          employmentType: e.employmentType as Employee['employmentType'],
+          salary: e.salary,
+          payFrequency: e.payFrequency as Employee['payFrequency'],
+          hireDate: e.hireDate,
+          terminationDate: e.terminationDate,
+          emergencyContactName: e.emergencyContactName,
+          emergencyContactPhone: e.emergencyContactPhone,
+          photo: e.photo,
+          status: e.terminationDate ? 'inactive' : 'active',
+        }));
+        setEmployees(mappedEmployees);
+        setPayrollRecords(mockPayrollRecords);
+        setTimeEntries(mockTimeEntries);
+      } catch (error) {
+        console.error('Failed to fetch employees:', error);
+        setPayrollRecords(mockPayrollRecords);
+        setTimeEntries(mockTimeEntries);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchEmployees();
   }, []);
 
   const filteredEmployees = employees.filter(employee => {

@@ -5,6 +5,7 @@ import {
   Receipt,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { formatCurrency } from '@/shared/lib/currency';
 import type { FinanceSummary } from '../types/finance.types';
 
 interface FinanceSummaryCardsProps {
@@ -23,50 +24,50 @@ export function FinanceSummaryCards({ summary }: FinanceSummaryCardsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-green-600">
-            ${summary.totalIncome.toLocaleString()}
+            {formatCurrency(summary.totalIncome)}
           </div>
-          <p className="text-xs text-muted-foreground">This month</p>
+          <p className="text-xs text-muted-foreground">Este mês</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
+          <CardTitle className="text-sm font-medium">Total Despesas</CardTitle>
           <TrendingDown className="h-4 w-4 text-red-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-red-600">
-            ${summary.totalExpenses.toLocaleString()}
+            {formatCurrency(summary.totalExpenses)}
           </div>
-          <p className="text-xs text-muted-foreground">This month</p>
+          <p className="text-xs text-muted-foreground">Este mês</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Net Income</CardTitle>
+          <CardTitle className="text-sm font-medium">Saldo Líquido</CardTitle>
           <Wallet className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className={`text-2xl font-bold ${netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            ${netIncome.toLocaleString()}
+            {formatCurrency(netIncome)}
           </div>
           <p className="text-xs text-muted-foreground">
-            {summary.savingsRate.toFixed(1)}% savings rate
+            {summary.savingsRate.toFixed(1)}% taxa de poupança
           </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Upcoming Bills</CardTitle>
+          <CardTitle className="text-sm font-medium">Contas a Pagar</CardTitle>
           <Receipt className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${summary.upcomingBills.toLocaleString()}
+            {formatCurrency(summary.upcomingBills)}
           </div>
-          <p className="text-xs text-muted-foreground">Due this month</p>
+          <p className="text-xs text-muted-foreground">Este mês</p>
         </CardContent>
       </Card>
     </div>

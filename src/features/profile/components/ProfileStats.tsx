@@ -1,4 +1,5 @@
-import { CheckSquare, Calendar, BookOpen, Package, DollarSign, ClipboardList } from 'lucide-react';
+import { CheckSquare, Calendar, BookOpen, Package, Banknote, ClipboardList } from 'lucide-react';
+import { formatCurrency } from '@/shared/lib/currency';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import type { UserStats } from '../types/profile.types';
 
@@ -39,9 +40,9 @@ export function ProfileStats({ stats }: ProfileStatsProps) {
       color: 'text-cyan-500',
     },
     {
-      label: 'Total Expenses',
-      value: `$${stats.totalExpenses.toLocaleString()}`,
-      icon: DollarSign,
+      label: 'Total Despesas',
+      value: formatCurrency(stats.totalExpenses),
+      icon: Banknote,
       color: 'text-emerald-500',
     },
   ];

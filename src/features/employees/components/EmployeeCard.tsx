@@ -2,12 +2,13 @@ import {
   Mail,
   Phone,
   Clock,
-  DollarSign,
+  Banknote,
 } from 'lucide-react';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Badge } from '@/shared/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { cn } from '@/shared/lib/utils';
+import { formatCurrency } from '@/shared/lib/currency';
 import type { Employee } from '../types/employees.types';
 
 interface EmployeeCardProps {
@@ -48,12 +49,12 @@ export function EmployeeCard({ employee, onSelect }: EmployeeCardProps) {
 
   const getPayInfo = () => {
     if (employee.salary) {
-      return `$${(employee.salary / 1000).toFixed(0)}k/year`;
+      return `${formatCurrency(employee.salary)}/ano`;
     }
     if (employee.hourlyRate) {
-      return `$${employee.hourlyRate}/hr`;
+      return `${formatCurrency(employee.hourlyRate)}/hr`;
     }
-    return 'Not set';
+    return 'Não definido';
   };
 
   return (
@@ -99,7 +100,7 @@ export function EmployeeCard({ employee, onSelect }: EmployeeCardProps) {
                 <span>{getScheduleSummary()}</span>
               </div>
               <div className="flex items-center gap-2">
-                <DollarSign className="h-3 w-3" />
+                <Banknote className="h-3 w-3" />
                 <span>{getPayInfo()}</span>
               </div>
             </div>

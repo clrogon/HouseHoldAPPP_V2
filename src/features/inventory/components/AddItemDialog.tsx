@@ -42,7 +42,7 @@ interface AddItemDialogProps {
   onAddItem: (item: Omit<InventoryItem, 'id'>) => Promise<void>;
 }
 
-const commonUnits = ['count', 'lbs', 'oz', 'gallons', 'liters', 'bottles', 'boxes', 'bags', 'cans', 'rolls', 'tablets', 'tubes'];
+const commonUnits = ['unidades', 'kg', 'g', 'L', 'ml', 'garrafas', 'caixas', 'sacos', 'latas', 'rolos', 'comprimidos', 'tubos'];
 
 export function AddItemDialog({ categories, onAddItem }: AddItemDialogProps) {
   const [open, setOpen] = useState(false);
@@ -61,7 +61,7 @@ export function AddItemDialog({ categories, onAddItem }: AddItemDialogProps) {
       name: '',
       category: '',
       quantity: 1,
-      unit: 'count',
+      unit: 'unidades',
       minQuantity: 1,
       location: '',
       expirationDate: '',
@@ -206,7 +206,7 @@ export function AddItemDialog({ categories, onAddItem }: AddItemDialogProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="price">Price ($)</Label>
+              <Label htmlFor="price">Preço (Kz)</Label>
               <Input
                 id="price"
                 type="number"

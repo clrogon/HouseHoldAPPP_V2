@@ -48,6 +48,9 @@ import { PetsPage } from '@/features/pets';
 // Kids
 import { KidsPage } from '@/features/kids';
 
+// Scanning
+import { ScanningPage } from '@/features/scanning';
+
 // Placeholder pages for other modules
 function PlaceholderPage({ title }: { title: string }) {
   return (
@@ -157,6 +160,14 @@ export const router = createBrowserRouter([
       {
         path: '/kids',
         element: <KidsPage />,
+      },
+      {
+        path: '/scanning',
+        element: (
+          <ProtectedRoute roles={['ADMIN', 'PARENT', 'STAFF']}>
+            <ScanningPage />
+          </ProtectedRoute>
+        ),
       },
     ],
   },

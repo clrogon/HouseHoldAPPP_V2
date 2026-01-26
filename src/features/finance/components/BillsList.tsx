@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import { cn } from '@/shared/lib/utils';
+import { formatCurrency } from '@/shared/lib/currency';
 import type { Bill } from '../types/finance.types';
 
 interface BillsListProps {
@@ -86,7 +87,7 @@ export function BillsList({ bills, onMarkPaid }: BillsListProps) {
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <div className="font-semibold">${bill.amount.toLocaleString()}</div>
+            <div className="font-semibold">{formatCurrency(bill.amount)}</div>
             <Badge variant="outline" className={cn(status.color)}>
               {status.label}
             </Badge>

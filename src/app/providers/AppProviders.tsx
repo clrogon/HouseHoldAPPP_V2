@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/shared/components/ui/toaster';
 import { LanguageProvider } from '@/shared/i18n';
+import { ThemeProvider } from '@/shared/theme';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,10 +19,12 @@ interface AppProvidersProps {
 export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider defaultLanguage="pt-PT">
-        {children}
-        <Toaster />
-      </LanguageProvider>
+      <ThemeProvider defaultTheme="system">
+        <LanguageProvider defaultLanguage="pt-PT">
+          {children}
+          <Toaster />
+        </LanguageProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

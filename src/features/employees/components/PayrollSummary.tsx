@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import {
-  DollarSign,
+  Banknote,
   Clock,
   CheckCircle2,
   AlertCircle,
@@ -17,6 +17,7 @@ import {
   TableRow,
 } from '@/shared/components/ui/table';
 import { cn } from '@/shared/lib/utils';
+import { formatCurrency } from '@/shared/lib/currency';
 import type { Employee, PayrollRecord } from '../types/employees.types';
 
 interface PayrollSummaryProps {
@@ -47,15 +48,15 @@ export function PayrollSummary({
           <CardTitle>Payroll</CardTitle>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <p className="text-sm text-muted-foreground">Pending</p>
+              <p className="text-sm text-muted-foreground">Pendente</p>
               <p className="text-lg font-bold text-orange-600">
-                ${totalPending.toLocaleString()}
+                {formatCurrency(totalPending)}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-muted-foreground">Paid (this period)</p>
+              <p className="text-sm text-muted-foreground">Pago (este período)</p>
               <p className="text-lg font-bold text-green-600">
-                ${totalPaid.toLocaleString()}
+                {formatCurrency(totalPaid)}
               </p>
             </div>
           </div>
@@ -64,8 +65,8 @@ export function PayrollSummary({
       <CardContent>
         {payrollRecords.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-[200px] text-muted-foreground">
-            <DollarSign className="h-12 w-12 mb-4" />
-            <p className="text-lg">No payroll records</p>
+            <Banknote className="h-12 w-12 mb-4" />
+            <p className="text-lg">Sem registos de pagamentos</p>
           </div>
         ) : (
           <Table>
@@ -106,12 +107,12 @@ export function PayrollSummary({
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>${grossPay.toFixed(2)}</TableCell>
+                    <TableCell>{formatCurrency(grossPay)}</TableCell>
                     <TableCell className="text-muted-foreground">
-                      -${record.deductions.toFixed(2)}
+                      -{formatCurrency(record.deductions)}
                     </TableCell>
                     <TableCell className="font-semibold">
-                      ${record.netPay.toFixed(2)}
+                      {formatCurrency(record.netPay)}
                     </TableCell>
                     <TableCell>
                       <Badge

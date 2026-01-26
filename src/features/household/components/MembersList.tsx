@@ -27,6 +27,7 @@ interface MembersListProps {
   members: HouseholdMember[];
   onRemove?: (memberId: string) => void;
   onChangeRole?: (memberId: string, role: HouseholdMember['role']) => void;
+  onEdit?: (member: HouseholdMember) => void;
 }
 
 const roleColors = {
@@ -42,7 +43,7 @@ const statusColors = {
   pending: 'bg-amber-500',
 };
 
-export function MembersList({ members, onRemove, onChangeRole }: MembersListProps) {
+export function MembersList({ members, onRemove, onChangeRole, onEdit }: MembersListProps) {
   const { user } = useAuthStore();
   const [removeDialog, setRemoveDialog] = useState<{ open: boolean; member: HouseholdMember | null }>({
     open: false,
@@ -123,9 +124,9 @@ export function MembersList({ members, onRemove, onChangeRole }: MembersListProp
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onEdit?.(member)}>
                         <Edit className="h-4 w-4 mr-2" />
-                        Edit Member
+                        Editar Membro
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <Mail className="h-4 w-4 mr-2" />

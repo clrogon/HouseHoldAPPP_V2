@@ -8,9 +8,10 @@ import type { Household } from '@/mocks/household';
 
 interface HouseholdProfileProps {
   household: Household;
+  onEdit?: () => void;
 }
 
-export function HouseholdProfile({ household }: HouseholdProfileProps) {
+export function HouseholdProfile({ household, onEdit }: HouseholdProfileProps) {
   const [copied, setCopied] = useState(false);
 
   const copyInviteCode = async () => {
@@ -36,9 +37,11 @@ export function HouseholdProfile({ household }: HouseholdProfileProps) {
               <CardDescription>Household Profile</CardDescription>
             </div>
           </div>
-          <Button variant="outline" size="sm">
-            Edit
-          </Button>
+          {onEdit && (
+            <Button variant="outline" size="sm" onClick={onEdit}>
+              Editar
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

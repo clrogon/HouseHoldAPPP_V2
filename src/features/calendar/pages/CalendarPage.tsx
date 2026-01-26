@@ -9,7 +9,7 @@ import { AgendaView } from '../components/AgendaView';
 import { EventDialog } from '../components/EventDialog';
 import { CreateEventDialog } from '../components/CreateEventDialog';
 import type { CalendarEvent, CalendarView } from '../types/calendar.types';
-import { mockEvents, deleteEvent as deleteEventApi } from '@/mocks/calendar';
+import { calendarApi } from '@/shared/api';
 
 export function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -20,12 +20,30 @@ export function CalendarPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load mock events
-    setIsLoading(true);
-    setTimeout(() => {
-      setEvents(mockEvents);
-      setIsLoading(false);
-    }, 300);
+    const fetchEvents = async () => {
+      setIsLoading(true);
+      try {
+        const data = await calendarApi.getEvents();
+        const mappedEvents: CalendarEvent[] = data.map(e => ({
+          id: e.id,
+          title: e.title,
+          description: e.description,
+          start: new Date(e.startDate),
+          end: new Date(e.endDate),
+          allDay: e.allDay,
+          location: e.location,
+          category: e.category.toLowerCase() as CalendarEvent['category'],
+          color: e.color,
+          isRecurring: e.isRecurring,
+        }));
+        setEvents(mappedEvents);
+      } catch (error) {
+        console.error('Failed to fetch events:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchEvents();
   }, []);
 
   const handlePrevious = useCallback(() => {
@@ -77,16 +95,43 @@ export function CalendarPage() {
   }, []);
 
   const handleCreateEvent = async (eventData: Omit<CalendarEvent, 'id'>) => {
-    const newEvent: CalendarEvent = {
-      ...eventData,
-      id: String(Date.now()),
-    };
-    setEvents(prev => [...prev, newEvent]);
+    try {
+      const created = await calendarApi.createEvent({
+        title: eventData.title,
+        description: eventData.description,
+        startDate: eventData.start.toISOString(),
+        endDate: eventData.end.toISOString(),
+        allDay: eventData.allDay,
+        location: eventData.location,
+        category: eventData.category?.toUpperCase() as 'BIRTHDAY' | 'APPOINTMENT' | 'MEETING' | 'HOLIDAY' | 'SCHOOL' | 'SPORTS' | 'OTHER',
+        color: eventData.color,
+        isRecurring: eventData.isRecurring,
+      });
+      const newEvent: CalendarEvent = {
+        id: created.id,
+        title: created.title,
+        description: created.description,
+        start: new Date(created.startDate),
+        end: new Date(created.endDate),
+        allDay: created.allDay,
+        location: created.location,
+        category: created.category.toLowerCase() as CalendarEvent['category'],
+        color: created.color,
+        isRecurring: created.isRecurring,
+      };
+      setEvents(prev => [...prev, newEvent]);
+    } catch (error) {
+      console.error('Failed to create event:', error);
+    }
   };
 
   const handleDeleteEvent = async (eventId: string) => {
-    await deleteEventApi(eventId);
-    setEvents(prev => prev.filter(e => e.id !== eventId));
+    try {
+      await calendarApi.deleteEvent(eventId);
+      setEvents(prev => prev.filter(e => e.id !== eventId));
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+    }
   };
 
   const renderView = () => {

@@ -1,4 +1,4 @@
-import { ArrowLeft, Syringe, Calendar, Pill, Scale, DollarSign, Dog, Cat, Bird, Fish, Rabbit } from 'lucide-react';
+import { ArrowLeft, Syringe, Calendar, Pill, Scale, Banknote, Dog, Cat, Bird, Fish, Rabbit } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Badge } from '@/shared/components/ui/badge';
@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/components/ui/table';
+import { formatCurrency } from '@/shared/lib/currency';
 import type { Pet, Vaccination, VetAppointment, Medication, WeightRecord, PetExpense } from '../types/pets.types';
 
 interface PetDetailsProps {
@@ -131,9 +132,9 @@ export function PetDetails({
                 <p className="text-xs text-muted-foreground">Medications</p>
               </div>
               <div className="p-3 bg-muted rounded-lg">
-                <DollarSign className="h-5 w-5 mx-auto mb-1 text-amber-500" />
-                <p className="text-2xl font-bold">${totalExpenses}</p>
-                <p className="text-xs text-muted-foreground">Expenses</p>
+                <Banknote className="h-5 w-5 mx-auto mb-1 text-amber-500" />
+                <p className="text-2xl font-bold">{formatCurrency(totalExpenses)}</p>
+                <p className="text-xs text-muted-foreground">Despesas</p>
               </div>
             </div>
           </div>
@@ -305,7 +306,7 @@ export function PetDetails({
                             {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
                           </Badge>
                         </TableCell>
-                        <TableCell>{apt.cost ? `$${apt.cost}` : '-'}</TableCell>
+                        <TableCell>{apt.cost ? formatCurrency(apt.cost) : '-'}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -361,8 +362,8 @@ export function PetDetails({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <span>Expenses</span>
-                <span className="text-2xl">${totalExpenses.toLocaleString()}</span>
+                <span>Despesas</span>
+                <span className="text-2xl">{formatCurrency(totalExpenses)}</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -388,7 +389,7 @@ export function PetDetails({
                           </Badge>
                         </TableCell>
                         <TableCell>{expense.description}</TableCell>
-                        <TableCell className="text-right font-medium">${expense.amount}</TableCell>
+                        <TableCell className="text-right font-medium">{formatCurrency(expense.amount)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

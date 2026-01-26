@@ -31,12 +31,14 @@ const statusIcons = {
   pending: Circle,
   in_progress: Clock,
   completed: CheckCircle2,
+  cancelled: AlertTriangle,
 };
 
 const statusColors = {
   pending: 'text-muted-foreground',
   in_progress: 'text-blue-500',
   completed: 'text-green-500',
+  cancelled: 'text-destructive',
 };
 
 function formatDueDate(dateString?: string): { text: string; isOverdue: boolean } | null {

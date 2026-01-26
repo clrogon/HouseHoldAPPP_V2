@@ -56,6 +56,7 @@ export const ptPT: TranslationKeys = {
     tasks: 'Tarefas',
     calendar: 'Calendário',
     inventory: 'Inventário',
+    scanning: 'Digitalização',
     finance: 'Finanças',
     vehicles: 'Veículos',
     employees: 'Funcionários',

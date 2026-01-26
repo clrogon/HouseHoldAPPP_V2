@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ChildCard } from '../components/ChildCard';
 import { ChildDetails } from '../components/ChildDetails';
 import { AddChildDialog } from '../components/AddChildDialog';
+import { EditChildDialog } from '../components/EditChildDialog';
 import type {
   Child,
   ChildSchool,
@@ -34,6 +35,7 @@ import {
   addChild,
   deleteChild,
   toggleChore,
+  updateChild,
 } from '@/mocks/kids';
 
 export function KidsPage() {
@@ -51,6 +53,7 @@ export function KidsPage() {
   const [chores, setChores] = useState<ChildChore[]>([]);
   const [growthRecords, setGrowthRecords] = useState<GrowthRecord[]>([]);
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
+  const [editingChild, setEditingChild] = useState<Child | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -79,7 +82,15 @@ export function KidsPage() {
   };
 
   const handleEditChild = (child: Child) => {
-    console.log('Edit child:', child);
+    setEditingChild(child);
+  };
+
+  const handleSaveChild = async (updatedChild: Child) => {
+    const saved = await updateChild(updatedChild.id, updatedChild);
+    setChildren(prev => prev.map(c => c.id === saved.id ? saved : c));
+    if (selectedChild?.id === saved.id) {
+      setSelectedChild(saved);
+    }
   };
 
   const handleDeleteChild = async (child: Child) => {
@@ -180,6 +191,16 @@ export function KidsPage() {
             );
           })}
         </div>
+      )}
+
+      {/* Edit Child Dialog */}
+      {editingChild && (
+        <EditChildDialog
+          child={editingChild}
+          open={!!editingChild}
+          onOpenChange={(open) => !open && setEditingChild(null)}
+          onSave={handleSaveChild}
+        />
       )}
     </div>
   );

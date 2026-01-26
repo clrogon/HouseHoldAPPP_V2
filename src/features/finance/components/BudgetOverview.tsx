@@ -11,6 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Progress } from '@/shared/components/ui/progress';
 import { cn } from '@/shared/lib/utils';
+import { formatCurrency } from '@/shared/lib/currency';
 import type { BudgetCategory } from '../types/finance.types';
 
 interface BudgetOverviewProps {
@@ -37,13 +38,13 @@ export function BudgetOverview({ categories }: BudgetOverviewProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Budget Overview</CardTitle>
+          <CardTitle>Resumo do Orçamento</CardTitle>
           <div className="text-right">
             <div className="text-2xl font-bold">
-              ${totalSpent.toLocaleString()} / ${totalBudget.toLocaleString()}
+              {formatCurrency(totalSpent)} / {formatCurrency(totalBudget)}
             </div>
             <p className="text-sm text-muted-foreground">
-              {overallPercentage.toFixed(1)}% of budget used
+              {overallPercentage.toFixed(1)}% do orçamento utilizado
             </p>
           </div>
         </div>
@@ -78,10 +79,10 @@ export function BudgetOverview({ categories }: BudgetOverviewProps) {
                   </div>
                   <div className="text-right">
                     <span className={cn('font-medium', isOverBudget && 'text-red-500')}>
-                      ${category.spent.toLocaleString()}
+                      {formatCurrency(category.spent)}
                     </span>
                     <span className="text-muted-foreground">
-                      {' '}/ ${category.budget.toLocaleString()}
+                      {' '}/ {formatCurrency(category.budget)}
                     </span>
                   </div>
                 </div>

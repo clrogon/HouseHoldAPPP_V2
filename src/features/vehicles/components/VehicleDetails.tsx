@@ -19,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/components/ui/table';
+import { formatCurrency } from '@/shared/lib/currency';
 import type { Vehicle, MaintenanceRecord, FuelRecord } from '../types/vehicles.types';
 
 interface VehicleDetailsProps {
@@ -133,7 +134,7 @@ export function VehicleDetails({
               <Wrench className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Maintenance</span>
             </div>
-            <p className="text-2xl font-bold">${totalMaintenanceCost.toFixed(0)}</p>
+            <p className="text-2xl font-bold">{formatCurrency(totalMaintenanceCost)}</p>
             <p className="text-xs text-muted-foreground">{maintenanceRecords.length} records</p>
           </CardContent>
         </Card>
@@ -144,7 +145,7 @@ export function VehicleDetails({
               <Fuel className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Fuel Cost</span>
             </div>
-            <p className="text-2xl font-bold">${totalFuelCost.toFixed(0)}</p>
+            <p className="text-2xl font-bold">{formatCurrency(totalFuelCost)}</p>
             <p className="text-xs text-muted-foreground">{fuelRecords.length} fill-ups</p>
           </CardContent>
         </Card>
@@ -169,7 +170,7 @@ export function VehicleDetails({
               <span className="text-sm text-muted-foreground">Total Cost</span>
             </div>
             <p className="text-2xl font-bold">
-              ${(totalMaintenanceCost + totalFuelCost).toFixed(0)}
+              {formatCurrency(totalMaintenanceCost + totalFuelCost)}
             </p>
             <p className="text-xs text-muted-foreground">all time</p>
           </CardContent>
@@ -223,7 +224,7 @@ export function VehicleDetails({
                           <TableCell>{record.mileage.toLocaleString()} mi</TableCell>
                           <TableCell>{record.provider || '-'}</TableCell>
                           <TableCell className="text-right font-medium">
-                            ${record.cost.toFixed(2)}
+                            {formatCurrency(record.cost)}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -267,10 +268,10 @@ export function VehicleDetails({
                           </TableCell>
                           <TableCell>{record.station || '-'}</TableCell>
                           <TableCell>{record.gallons.toFixed(2)} gal</TableCell>
-                          <TableCell>${record.pricePerGallon.toFixed(2)}</TableCell>
-                          <TableCell>{record.mileage.toLocaleString()} mi</TableCell>
+                          <TableCell>{formatCurrency(record.pricePerGallon)}</TableCell>
+                          <TableCell>{record.mileage.toLocaleString()} km</TableCell>
                           <TableCell className="text-right font-medium">
-                            ${record.totalCost.toFixed(2)}
+                            {formatCurrency(record.totalCost)}
                           </TableCell>
                         </TableRow>
                       ))}

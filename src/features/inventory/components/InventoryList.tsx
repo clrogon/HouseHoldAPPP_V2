@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
 import { cn } from '@/shared/lib/utils';
+import { formatCurrency } from '@/shared/lib/currency';
 import type { InventoryItem } from '../types/inventory.types';
 
 interface InventoryListProps {
@@ -85,7 +86,7 @@ export function InventoryList({
               <div className="font-medium">{item.name}</div>
               {item.price && (
                 <div className="text-xs text-muted-foreground">
-                  ${item.price.toFixed(2)}
+                  {formatCurrency(item.price)}
                 </div>
               )}
             </TableCell>

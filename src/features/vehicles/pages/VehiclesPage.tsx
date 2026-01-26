@@ -4,12 +4,7 @@ import { VehicleCard } from '../components/VehicleCard';
 import { VehicleDetails } from '../components/VehicleDetails';
 import { AddVehicleDialog } from '../components/AddVehicleDialog';
 import type { Vehicle, MaintenanceRecord, FuelRecord } from '../types/vehicles.types';
-import {
-  mockVehicles,
-  mockMaintenanceRecords,
-  mockFuelRecords,
-  addVehicle,
-} from '@/mocks/vehicles';
+import { vehiclesApi } from '@/shared/api';
 import { mockMembers } from '@/mocks/household';
 
 export function VehiclesPage() {
@@ -20,18 +15,95 @@ export function VehiclesPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setVehicles(mockVehicles);
-      setMaintenanceRecords(mockMaintenanceRecords);
-      setFuelRecords(mockFuelRecords);
-      setIsLoading(false);
-    }, 300);
+    const fetchVehicles = async () => {
+      setIsLoading(true);
+      try {
+        const data = await vehiclesApi.getVehicles();
+        const mappedVehicles: Vehicle[] = data.map(v => ({
+          id: v.id,
+          name: `${v.make} ${v.model}`,
+          make: v.make,
+          model: v.model,
+          year: v.year,
+          type: v.type.toLowerCase() as Vehicle['type'],
+          color: v.color,
+          licensePlate: v.licensePlate,
+          vin: v.vin,
+          mileage: v.mileage,
+        }));
+        setVehicles(mappedVehicles);
+
+        // Fetch maintenance and fuel records for all vehicles
+        const maintenancePromises = data.map(v => vehiclesApi.getMaintenanceHistory(v.id));
+        const fuelPromises = data.map(v => vehiclesApi.getFuelLogs(v.id));
+
+        const [maintenanceResults, fuelResults] = await Promise.all([
+          Promise.all(maintenancePromises),
+          Promise.all(fuelPromises),
+        ]);
+
+        const allMaintenance: MaintenanceRecord[] = maintenanceResults.flat().map(m => ({
+          id: m.id,
+          vehicleId: m.vehicleId,
+          type: m.type,
+          description: m.description,
+          date: m.date,
+          mileage: m.mileage,
+          cost: m.cost,
+          serviceProvider: m.serviceProvider,
+          nextDueDate: m.nextDueDate,
+        }));
+
+        const allFuel: FuelRecord[] = fuelResults.flat().map(f => ({
+          id: f.id,
+          vehicleId: f.vehicleId,
+          date: f.date,
+          gallons: f.gallons,
+          pricePerGallon: f.pricePerGallon,
+          totalCost: f.totalCost,
+          mileage: f.mileage,
+          station: f.station,
+        }));
+
+        setMaintenanceRecords(allMaintenance);
+        setFuelRecords(allFuel);
+      } catch (error) {
+        console.error('Failed to fetch vehicles:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchVehicles();
   }, []);
 
   const handleAddVehicle = async (vehicleData: Omit<Vehicle, 'id'>) => {
-    const newVehicle = await addVehicle(vehicleData);
-    setVehicles(prev => [...prev, newVehicle]);
+    try {
+      const created = await vehiclesApi.createVehicle({
+        type: vehicleData.type.toUpperCase() as 'CAR' | 'TRUCK' | 'SUV' | 'VAN' | 'MOTORCYCLE' | 'OTHER',
+        make: vehicleData.make,
+        model: vehicleData.model,
+        year: vehicleData.year,
+        color: vehicleData.color,
+        licensePlate: vehicleData.licensePlate,
+        vin: vehicleData.vin,
+        mileage: vehicleData.mileage,
+      });
+      const newVehicle: Vehicle = {
+        id: created.id,
+        name: `${created.make} ${created.model}`,
+        make: created.make,
+        model: created.model,
+        year: created.year,
+        type: created.type.toLowerCase() as Vehicle['type'],
+        color: created.color,
+        licensePlate: created.licensePlate,
+        vin: created.vin,
+        mileage: created.mileage,
+      };
+      setVehicles(prev => [...prev, newVehicle]);
+    } catch (error) {
+      console.error('Failed to add vehicle:', error);
+    }
   };
 
   const householdMembers = mockMembers.map(m => ({

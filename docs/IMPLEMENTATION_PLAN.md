@@ -69,6 +69,7 @@ household-hero-v2/                    # NEW PROJECT DIRECTORY
 │   │   │   │   ├── finance/        # Finance & budget module
 │   │   │   │   ├── tasks/          # Task management
 │   │   │   │   ├── inventory/      # Inventory with categories
+│   │   │   │   ├── scanning/       # Receipt scanning & barcode
 │   │   │   │   ├── calendar/       # Events & scheduling
 │   │   │   │   ├── recipes/        # Recipe management
 │   │   │   │   ├── dashboard/      # Dashboard data aggregation
@@ -95,6 +96,7 @@ household-hero-v2/                    # NEW PROJECT DIRECTORY
 │       │   │   ├── finance/        # Finance & budgets
 │       │   │   ├── tasks/          # Task management
 │       │   │   ├── inventory/      # Inventory management
+│       │   │   ├── scanning/       # Receipt scanning & barcode
 │       │   │   ├── calendar/       # Calendar & events
 │       │   │   └── recipes/        # Recipe management
 │       │   ├── shared/             # Shared components
@@ -322,7 +324,105 @@ Garage
 
 ---
 
-### 10. Calendar Module
+### 10. Receipt Scanning & Barcode Module
+**Purpose:** AI-powered receipt scanning and barcode management for easy inventory and budget tracking
+
+**Features:**
+
+**Receipt Scanning:**
+- Camera capture or image upload for receipts
+- OCR text extraction (hybrid approach):
+  - **Free tier:** Tesseract.js (client-side, ~70-80% accuracy, offline)
+  - **AI tier:** OpenAI Vision or Google Cloud Vision (optional, ~95% accuracy)
+  - Auto-fallback if AI service fails
+- Smart receipt parsing:
+  - Extract store name, date, total, tax
+  - Parse line items with quantities and prices
+  - Auto-categorize items (Groceries, Household, etc.)
+- Receipt review dialog:
+  - Visual preview of scanned receipt
+  - Editable parsed data with validation
+  - Confidence scoring (highlight uncertain OCR results)
+  - Item-to-inventory matching
+- **Dual-action processing:**
+  - Create financial transaction in Finance module
+  - Auto-update inventory quantities
+- Permission-based workflows:
+  - **Staff:** Can scan receipts to update inventory only
+  - **Parents/Admin:** Can create transactions + update inventory
+
+**Barcode Scanning:**
+- Real-time barcode detection (EAN-13, UPC-A, QR codes)
+- Multiple scanning modes:
+  - **Quick Lookup:** Scan to find/add inventory items
+  - **Receipt Verification:** Scan receipt barcode for validation
+  - **Shopping List Check:** Scan items while shopping to check them off
+- Product lookup integration:
+  - Open Food Facts API for product information
+  - Local inventory search first
+  - Fallback to manual entry
+- Quick actions after scan:
+  - Adjust quantity (+/- buttons)
+  - Add to shopping list
+  - View item details
+
+**OCR Service Configuration:**
+- Settings panel for OCR service selection
+- API key management (encrypted, browser-stored)
+- Service testing and validation
+- Usage cost tracking
+- Visual indicators showing which service was used
+
+**Tech Stack:**
+- **OCR:** Tesseract.js (default), OpenAI Vision API (optional), Google Cloud Vision (optional)
+- **Barcode:** @zxing/browser and @zxing/library
+- **Camera:** react-webcam for simplified camera access
+- **Validation:** Zod schemas for receipt data
+- **Storage:** localStorage for OCR service config
+
+**Database Integration:**
+- `Transaction.receiptUrl` - stores receipt image data
+- `Transaction.receiptItems[]` - array of parsed receipt items
+- `InventoryItem.barcode` - barcode field for products
+- `InventoryItem.photos[]` - product images
+
+**Dashboard Widgets:**
+- Recent receipts processed
+- OCR service status and usage
+- Receipt processing statistics
+- Cost savings from hybrid OCR approach
+
+**Access Permissions:**
+| Feature | STAFF | MEMBER | PARENT | ADMIN |
+|---------|-------|--------|--------|-------|
+| Scan Receipt → View | ✅ | ❌ | ✅ | ✅ |
+| Scan Receipt → Update Inventory | ✅ | ❌ | ✅ | ✅ |
+| Scan Receipt → Create Transaction | ❌ | ❌ | ✅ | ✅ |
+| Barcode Lookup | ✅ | ✅ | ✅ | ✅ |
+| Shopping List Verify | ✅ | ✅ | ✅ | ✅ |
+| OCR Service Config | ❌ | ❌ | ✅ | ✅ |
+
+**Implementation Notes:**
+- Start with free Tesseract.js (zero barrier to entry)
+- Add AI service support as optional upgrade
+- Automatic fallback ensures reliability
+- Mobile-first design (camera access critical)
+- Offline-capable with free tier
+- Graceful degradation when camera unavailable
+
+**Future Enhancements:**
+- Multi-receipt batch processing
+- Receipt templates for common stores
+- Warranty tracking from receipts
+- Receipt history and archive
+- Export receipts to PDF/CSV
+- Receipt sharing between household members
+- Machine learning for improved parsing
+- Confidence-based auto-approval (skip review for high confidence)
+
+---
+
+### 11. Calendar Module
 **Purpose:** Unified calendar for all household events
 
 **Features:**
@@ -342,7 +442,7 @@ Garage
 
 ---
 
-### 11. Recipes Module
+### 12. Recipes Module
 **Purpose:** Recipe collection and meal planning
 
 **Features:**
@@ -362,7 +462,7 @@ Garage
 
 ---
 
-### 12. Dashboard Module
+### 13. Dashboard Module
 **Purpose:** Centralized data aggregation and visualization
 
 **Features:**
@@ -398,7 +498,7 @@ Garage
 
 ---
 
-### 13. Notifications Module
+### 14. Notifications Module
 **Purpose:** System-wide notification handling
 
 **Features:**
@@ -472,6 +572,7 @@ Garage
 - Vehicles module
 - Pets module
 - Inventory module with categories
+- Receipt scanning & barcode module (Phase 1: Tesseract.js)
 
 ### Phase 4: Finance & Analytics (Week 11-12)
 - Finance module
@@ -482,6 +583,7 @@ Garage
 ### Phase 5: Polish & Testing (Week 13-14)
 - Recipes module
 - Notifications
+- Receipt scanning AI services (OpenAI Vision, Google Cloud Vision - optional)
 - UI/UX improvements
 - Testing and bug fixes
 - Documentation
@@ -530,6 +632,7 @@ Garage
 /api/v1/finance/*
 /api/v1/tasks/*
 /api/v1/inventory/*
+/api/v1/scanning/*               # Receipt scanning & barcode
 /api/v1/calendar/*
 /api/v1/recipes/*
 /api/v1/dashboard/*

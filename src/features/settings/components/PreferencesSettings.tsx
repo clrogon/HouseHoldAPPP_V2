@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select';
 import { useLanguage, availableLanguages, type Language } from '@/shared/i18n';
+import { useTheme } from '@/shared/theme';
 import { getCurrencyOptions } from '@/shared/lib/currency';
 import type { UserPreferences } from '../types/settings.types';
 
@@ -37,8 +38,16 @@ const dateFormats = [
 
 export function PreferencesSettings({ preferences, onUpdate }: PreferencesSettingsProps) {
   const { language, setLanguage, t } = useLanguage();
+  const { theme: currentTheme, setTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [localPrefs, setLocalPrefs] = useState(preferences);
+
+  // Sync local theme with global theme context
+  useEffect(() => {
+    if (localPrefs.theme !== currentTheme) {
+      setLocalPrefs(prev => ({ ...prev, theme: currentTheme }));
+    }
+  }, [currentTheme, localPrefs.theme]);
 
   // Get currency options based on current language
   const currencies = getCurrencyOptions(language);
@@ -56,6 +65,11 @@ export function PreferencesSettings({ preferences, onUpdate }: PreferencesSettin
     // If language changes, also update the global language context
     if (key === 'language') {
       setLanguage(value as Language);
+    }
+
+    // If theme changes, also update the global theme context
+    if (key === 'theme') {
+      setTheme(value as 'light' | 'dark' | 'system');
     }
   };
 

@@ -11,12 +11,10 @@ import {
 } from '@/shared/components/ui/select';
 import { RecipeCard } from '../components/RecipeCard';
 import { RecipeDetails } from '../components/RecipeDetails';
+import { AddRecipeDialog } from '../components/AddRecipeDialog';
 import type { Recipe, MealPlan } from '../types/recipes.types';
-import {
-  mockRecipes,
-  mockMealPlans,
-  toggleFavorite as toggleFavoriteApi,
-} from '@/mocks/recipes';
+import { recipesApi } from '@/shared/api';
+import { mockMealPlans, toggleFavorite as toggleFavoriteApi } from '@/mocks/recipes';
 
 export function RecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -29,12 +27,41 @@ export function RecipesPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setRecipes(mockRecipes);
-      setMealPlans(mockMealPlans);
-      setIsLoading(false);
-    }, 300);
+    const fetchRecipes = async () => {
+      setIsLoading(true);
+      try {
+        const data = await recipesApi.getRecipes();
+        const mappedRecipes: Recipe[] = data.map(r => ({
+          id: r.id,
+          title: r.title,
+          description: r.description || '',
+          category: (r.category?.toLowerCase() || 'dinner') as Recipe['category'],
+          difficulty: 'medium' as Recipe['difficulty'],
+          prepTime: r.prepTime || 0,
+          cookTime: r.cookTime || 0,
+          servings: r.servings || 4,
+          ingredients: r.ingredients.map(i => ({
+            name: i.name,
+            amount: String(i.quantity),
+            unit: i.unit,
+          })),
+          instructions: r.instructions.map(i => i.instruction),
+          tags: r.tags || [],
+          imageUrl: '',
+          isFavorite: false,
+          createdBy: r.creatorId,
+          createdAt: r.createdAt,
+        }));
+        setRecipes(mappedRecipes);
+        setMealPlans(mockMealPlans);
+      } catch (error) {
+        console.error('Failed to fetch recipes:', error);
+        setMealPlans(mockMealPlans);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchRecipes();
   }, []);
 
   const filteredRecipes = useMemo(() => {
@@ -61,6 +88,53 @@ export function RecipesPage() {
     );
     if (selectedRecipe?.id === recipeId) {
       setSelectedRecipe(updated);
+    }
+  };
+
+  const handleAddRecipe = async (recipeData: Omit<Recipe, 'id'>) => {
+    try {
+      const created = await recipesApi.createRecipe({
+        title: recipeData.title,
+        description: recipeData.description,
+        prepTime: recipeData.prepTime,
+        cookTime: recipeData.cookTime,
+        servings: recipeData.servings,
+        category: recipeData.category,
+        tags: recipeData.tags,
+        ingredients: recipeData.ingredients.map((i, idx) => ({
+          name: i.name,
+          quantity: parseFloat(i.amount) || 1,
+          unit: i.unit,
+        })),
+        instructions: recipeData.instructions.map((text, idx) => ({
+          stepNumber: idx + 1,
+          instruction: text,
+        })),
+      });
+      const newRecipe: Recipe = {
+        id: created.id,
+        title: created.title,
+        description: created.description || '',
+        category: (created.category?.toLowerCase() || 'dinner') as Recipe['category'],
+        difficulty: 'medium' as Recipe['difficulty'],
+        prepTime: created.prepTime || 0,
+        cookTime: created.cookTime || 0,
+        servings: created.servings || 4,
+        ingredients: created.ingredients.map(i => ({
+          name: i.name,
+          amount: String(i.quantity),
+          unit: i.unit,
+        })),
+        instructions: created.instructions.map(i => i.instruction),
+        tags: created.tags || [],
+        imageUrl: '',
+        isFavorite: false,
+        createdBy: created.creatorId,
+        createdAt: created.createdAt,
+      };
+      setRecipes(prev => [...prev, newRecipe]);
+    } catch (error) {
+      console.error('Failed to add recipe:', error);
     }
   };
 
@@ -91,6 +165,7 @@ export function RecipesPage() {
             Browse, save, and plan your household meals.
           </p>
         </div>
+        <AddRecipeDialog onAddRecipe={handleAddRecipe} />
       </div>
 
       {/* Filters */}

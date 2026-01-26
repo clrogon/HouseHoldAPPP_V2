@@ -3,6 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Progress } from '@/shared/components/ui/progress';
+import { formatCurrency } from '@/shared/lib/currency';
 
 interface BudgetCategory {
   name: string;
@@ -43,15 +44,15 @@ export function BudgetWidget({ categories, totalSpent, totalBudget }: BudgetWidg
           {/* Total Progress */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Total Spent</span>
-              <span className="font-medium">${totalSpent.toLocaleString()} / ${totalBudget.toLocaleString()}</span>
+              <span className="text-muted-foreground">Total Gasto</span>
+              <span className="font-medium">{formatCurrency(totalSpent)} / {formatCurrency(totalBudget)}</span>
             </div>
             <Progress
               value={percentage}
               className={percentage > 80 ? '[&>div]:bg-amber-500' : percentage > 95 ? '[&>div]:bg-red-500' : ''}
             />
             <p className={`text-xs ${remaining < 500 ? 'text-amber-500' : 'text-muted-foreground'}`}>
-              ${remaining.toLocaleString()} remaining
+              {formatCurrency(remaining)} restante
             </p>
           </div>
 
@@ -73,7 +74,7 @@ export function BudgetWidget({ categories, totalSpent, totalBudget }: BudgetWidg
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Spent']}
+                  formatter={(value) => [formatCurrency(Number(value)), 'Gasto']}
                 />
                 <Legend
                   layout="horizontal"
